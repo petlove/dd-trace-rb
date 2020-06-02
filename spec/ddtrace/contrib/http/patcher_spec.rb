@@ -14,7 +14,7 @@ RSpec.describe 'net/http patcher' do
 
     Datadog.configuration[:http].reset!
     Datadog.configure do |c|
-      c.use :http, tracer: tracer
+      c.use :http
     end
   end
 
@@ -35,7 +35,7 @@ RSpec.describe 'net/http patcher' do
 
     before do
       Datadog.configure do |c|
-        c.use :http, tracer: tracer, service_name: new_service_name
+        c.use :http, service_name: new_service_name
       end
     end
 

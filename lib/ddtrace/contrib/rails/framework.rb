@@ -50,6 +50,20 @@ module Datadog
           # end
         end
 
+        def self.reconfigure
+          datadog_config = Datadog.configuration
+
+          rails_config = config_with_defaults
+          datadog_config.service ||= rails_config[:service_name]
+
+          reconfigure_rack!(datadog_config, rails_config)
+          reconfigure_action_cable!(datadog_config, rails_config)
+          reconfigure_active_support!(datadog_config, rails_config)
+          reconfigure_action_pack!(datadog_config, rails_config)
+          reconfigure_action_view!(datadog_config, rails_config)
+          reconfigure_active_record!(datadog_config, rails_config)
+        end
+
         def self.config_with_defaults
           # We set defaults here instead of in the patcher because we need to wait
           # for the Rails application to be fully initialized.
@@ -72,14 +86,24 @@ module Datadog
           )
         end
 
+        def self.reconfigure_rack!(datadog_config, rails_config)
+          datadog_config[:rack][:service_name] = rails_config[:service_name]
+          datadog_config[:rack][:middleware_names] = rails_config[:middleware_names]
+          datadog_config[:rack][:distributed_tracing] = rails_config[:distributed_tracing]
+        end
+
         def self.activate_active_support!(datadog_config, rails_config)
           return unless defined?(::ActiveSupport)
 
           datadog_config.use(
             :active_support,
             cache_service: rails_config[:cache_service],
-            # tracer: rails_config[:tracer]
+          # tracer: rails_config[:tracer]
           )
+        end
+
+        def self.reconfigure_active_support!(datadog_config, rails_config)
+          datadog_config[:active_support][:cache_service] = rails_config[:cache_service]
         end
 
         def self.activate_action_cable!(datadog_config, rails_config)
@@ -88,8 +112,12 @@ module Datadog
           datadog_config.use(
             :action_cable,
             service_name: "#{rails_config[:service_name]}-#{Contrib::ActionCable::Ext::SERVICE_NAME}",
-            # tracer: rails_config[:tracer]
+          # tracer: rails_config[:tracer]
           )
+        end
+
+        def self.reconfigure_action_cable!(datadog_config, rails_config)
+          datadog_config[:action_cable][:service_name] = rails_config[:service_name]
         end
 
         def self.activate_action_pack!(datadog_config, rails_config)
@@ -102,8 +130,12 @@ module Datadog
           datadog_config.use(
             :action_pack,
             service_name: rails_config[:service_name],
-            # tracer: rails_config[:tracer]
+          # tracer: rails_config[:tracer]
           )
+        end
+
+        def self.reconfigure_action_pack!(datadog_config, rails_config)
+          datadog_config[:action_pack][:service_name] = rails_config[:service_name]
         end
 
         def self.activate_action_view!(datadog_config, rails_config)
@@ -112,8 +144,12 @@ module Datadog
           datadog_config.use(
             :action_view,
             service_name: rails_config[:service_name],
-            # tracer: rails_config[:tracer]
+          # tracer: rails_config[:tracer]
           )
+        end
+
+        def self.reconfigure_action_view!(datadog_config, rails_config)
+          datadog_config[:action_view][:service_name] = rails_config[:service_name]
         end
 
         def self.activate_active_record!(datadog_config, rails_config)
@@ -122,8 +158,12 @@ module Datadog
           datadog_config.use(
             :active_record,
             service_name: rails_config[:database_service],
-            # tracer: rails_config[:tracer]
+          # tracer: rails_config[:tracer]
           )
+        end
+
+        def self.reconfigure_active_record!(datadog_config, rails_config)
+          datadog_config[:active_record][:service_name] = rails_config[:database_service]
         end
       end
     end

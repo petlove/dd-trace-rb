@@ -60,11 +60,16 @@ RSpec.describe 'Presto::Client instrumentation' do
       Datadog.registry[:presto].reset_configuration!
       example.run
       Datadog.registry[:presto].reset_configuration!
+      Datadog.configuration.reset!
     end
   end
 
   context 'when the tracer is disabled' do
-    before(:each) { tracer.enabled = false }
+    before do
+      Datadog.configure do |c|
+        c.tracer.enabled = false
+      end
+    end
 
     it 'does not produce spans' do
       client.run('SELECT 1')
@@ -92,7 +97,7 @@ RSpec.describe 'Presto::Client instrumentation' do
       context 'when the client is configured' do
         context 'with a different service name' do
           let(:service) { 'presto-primary' }
-          let(:configuration_options) { { tracer: tracer, service_name: service } }
+          let(:configuration_options) { { service_name: service } }
 
           it_behaves_like 'a Presto trace'
         end

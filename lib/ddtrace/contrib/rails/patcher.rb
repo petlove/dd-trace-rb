@@ -10,6 +10,20 @@ module Datadog
       module Patcher
         include Contrib::Patcher
 
+        module X
+          def patch
+            if patched?
+              Datadog::Contrib::Rails::Framework.reconfigure
+            else
+              super()
+            end
+          end
+        end
+
+        class << self
+          prepend(X)
+        end
+
         module_function
 
         def target_version

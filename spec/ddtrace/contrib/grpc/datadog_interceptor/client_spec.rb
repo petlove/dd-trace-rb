@@ -7,7 +7,7 @@ require 'ddtrace'
 RSpec.describe 'tracing on the client connection' do
   subject(:client) { Datadog::Contrib::GRPC::DatadogInterceptor::Client.new }
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { tracer: tracer, service_name: 'rspec' } }
+  let(:configuration_options) { { service_name: 'rspec' } }
 
   let(:span) { tracer.writer.spans.first }
 

@@ -35,6 +35,12 @@ RSpec.describe 'ConcurrentRuby integration tests' do
 
   shared_examples_for 'deferred execution' do
     before do
+      Datadog.configure do |c|
+        c.use :concurrent_ruby#, tracer: tracer
+      end
+    end
+
+    before do
       deferred_execution
     end
 
@@ -54,7 +60,7 @@ RSpec.describe 'ConcurrentRuby integration tests' do
   describe 'patching' do
     subject(:patch) do
       Datadog.configure do |c|
-        c.use :concurrent_ruby, tracer: tracer
+        c.use :concurrent_ruby#, tracer: tracer
       end
     end
 
@@ -67,6 +73,11 @@ RSpec.describe 'ConcurrentRuby integration tests' do
   context 'when context propagation is disabled' do
     it_should_behave_like 'deferred execution'
 
+    before do
+      Datadog.configure do |c|
+      end
+    end
+
     it 'inner span should not have parent' do
       expect(inner_span.parent).to be_nil
     end
@@ -77,7 +88,7 @@ RSpec.describe 'ConcurrentRuby integration tests' do
 
     before do
       Datadog.configure do |c|
-        c.use :concurrent_ruby, tracer: tracer
+        c.use :concurrent_ruby#, tracer: tracer
       end
     end
 

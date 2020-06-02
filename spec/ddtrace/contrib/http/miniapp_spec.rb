@@ -18,7 +18,7 @@ RSpec.describe 'net/http miniapp tests' do
   # let(:tracer) { get_test_tracer }
 
   before(:each) do
-    Datadog.configure { |c| c.use :http, tracer: tracer }
+    Datadog.configure { |c| c.use :http }
   end
 
   context 'when performing a trace around HTTP calls' do

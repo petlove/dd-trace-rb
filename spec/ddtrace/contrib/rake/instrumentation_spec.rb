@@ -9,7 +9,7 @@ require 'ddtrace/contrib/rake/patcher'
 
 RSpec.describe Datadog::Contrib::Rake::Instrumentation do
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { tracer: tracer, enabled: true } }
+  let(:configuration_options) { { enabled: true } }
   let(:spans) { tracer.writer.spans }
   let(:span) { spans.first }
 

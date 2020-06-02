@@ -5,6 +5,8 @@ require 'active_support/notifications'
 require 'ddtrace/contrib/active_support/notifications/subscription'
 
 RSpec.describe Datadog::Contrib::ActiveSupport::Notifications::Subscription do
+  before { Datadog.configure { } }
+
   describe 'instance' do
     subject(:subscription) { described_class.new(tracer, span_name, options, &block) }
     # let(:tracer) { get_test_tracer }

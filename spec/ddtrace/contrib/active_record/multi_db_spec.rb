@@ -7,7 +7,7 @@ require 'sqlite3'
 
 RSpec.describe 'ActiveRecord multi-database implementation' do
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { tracer: tracer, service_name: default_db_service_name } }
+  let(:configuration_options) { { service_name: default_db_service_name } }
   let(:default_db_service_name) { 'default-db' }
 
   let(:mysql) do
@@ -133,12 +133,12 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
 
           Datadog.configure do |c|
             c.use :active_record, describes: :gadget do |gadget_db|
-              gadget_db.tracer = tracer
+              # gadget_db.tracer = tracer
               gadget_db.service_name = gadget_db_service_name
             end
 
             c.use :active_record, describes: :widget do |widget_db|
-              widget_db.tracer = tracer
+              # widget_db.tracer = tracer
               widget_db.service_name = widget_db_service_name
             end
           end

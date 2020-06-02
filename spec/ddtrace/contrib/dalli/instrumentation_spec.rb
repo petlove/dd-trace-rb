@@ -63,7 +63,7 @@ RSpec.describe 'Dalli instrumentation' do
 
     before do
       Datadog.configure do |c|
-        c.use :dalli, describes: "#{test_host}:#{test_port}", tracer: tracer, service_name: service_name
+        c.use :dalli, describes: "#{test_host}:#{test_port}", service_name: service_name
       end
     end
 

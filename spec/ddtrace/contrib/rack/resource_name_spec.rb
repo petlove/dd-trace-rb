@@ -13,7 +13,7 @@ RSpec.describe 'Rack integration with other middleware' do
     {
       application: app,
       middleware_names: true,
-      tracer: tracer
+      # tracer: tracer
     }
   end
 
