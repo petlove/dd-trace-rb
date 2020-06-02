@@ -29,7 +29,7 @@ module Datadog
               get_option(:service_name),
               app: Ext::APP,
               app_type: Datadog::Ext::AppTypes::CACHE,
-              tracer: get_option(:tracer)
+              tracer: -> { get_option(:tracer) }
             ).onto(::Dalli)
         end
 
@@ -47,9 +47,9 @@ module Datadog
             Upgrade to the configuration API using the migration guide here:
             https://github.com/DataDog/dd-trace-rb/releases/tag/v0.11.0).freeze
 
-          def tracer=(tracer)
-            Datadog.configuration[:dalli][:tracer] = tracer
-          end
+          # def tracer=(tracer)
+          #   Datadog.configuration[:dalli][:tracer] = tracer
+          # end
 
           def service_name=(service_name)
             Datadog.configuration[:dalli][:service_name] = service_name
