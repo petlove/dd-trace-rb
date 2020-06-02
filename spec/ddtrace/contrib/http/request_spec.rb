@@ -161,7 +161,8 @@ RSpec.describe 'net/http requests' do
         stub_request(:get, "#{uri}#{path}").to_return(status: 200, body: '{}')
 
         Net::HTTP.start(host, port) do |http|
-          Datadog::Pin.get_from(http).tracer = tracer
+          # TODO does this test still make sense?
+          # Datadog::Pin.get_from(http).tracer = tracer
           http.request(request)
         end
       end
