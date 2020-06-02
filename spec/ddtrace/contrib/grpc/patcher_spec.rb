@@ -62,17 +62,19 @@ RSpec.describe 'GRPC instrumentation' do
           end
         end
 
-        # Make sure 'tracer' passes through to underlying configuration
-        describe 'tracer=' do
-          let(:new_tracer) { double('tracer') }
-          after(:each) { pin.tracer = tracer }
-
-          it 'updates the configuration service name' do
-            expect { pin.tracer = new_tracer }
-              .to change { Datadog.configuration[:grpc][:tracer] }
-              .from(tracer).to(new_tracer)
-          end
-        end
+        # # Make sure 'tracer' passes through to underlying configuration
+        # describe 'tracer=' do
+        #   let(:new_tracer) { double('tracer') }
+        #   after(:each) {
+        #     pin.tracer = tracer
+        #   }
+        #
+        #   it 'updates the configuration service name' do
+        #     expect { pin.tracer = new_tracer }
+        #       .to change { Datadog.configuration[:grpc][:tracer] }
+        #       .from(tracer).to(new_tracer)
+        #   end
+        # end
       end
     end
 

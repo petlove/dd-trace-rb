@@ -18,7 +18,7 @@ module Datadog
     attr_accessor :name
     attr_accessor :service_name
     attr_accessor :tags
-    attr_writer :tracer
+    attr_reader :tracer
     attr_accessor :writer
 
     alias service= service_name=
@@ -35,7 +35,7 @@ module Datadog
     end
 
     def tracer
-      @tracer || Datadog.tracer
+      @tracer.is_a?(Proc) ? @tracer.call : (@tracer || Datadog.tracer)
     end
 
     def enabled?
