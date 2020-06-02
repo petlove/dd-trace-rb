@@ -25,6 +25,9 @@ module Datadog
     alias service service_name
 
     def initialize(service_name, options = {})
+      # TODO change to deprecation warning
+      raise "Tracer cannot be eagerly cached." unless options[:tracer].is_a?(Proc) || options[:tracer].nil?
+
       @app = options[:app]
       @app_type = options[:app_type]
       @config = options[:config]
