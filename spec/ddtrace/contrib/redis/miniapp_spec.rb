@@ -19,7 +19,7 @@ RSpec.describe 'Redis mini app test' do
     Datadog.configure { |c| c.use :redis }
 
     # Configure client instance with tracer
-    Datadog.configure(client, tracer: tracer)
+    Datadog.configure(client)
   end
 
   let(:client) do
