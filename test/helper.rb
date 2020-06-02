@@ -269,4 +269,8 @@ module TestTracerHelper
     Datadog.registry[integration_name].reset_configuration!
     Datadog.configuration[integration_name].reset_options!
   end
+
+  def spans
+    @spans ||= @tracer.writer.spans(:keep)
+  end
 end

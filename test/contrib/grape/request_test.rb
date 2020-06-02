@@ -1,7 +1,22 @@
+require 'helper'
+
+require 'ddtrace'
 require 'contrib/grape/app'
 
 # rubocop:disable Metrics/AbcSize
 class TracedAPITest < BaseAPITest
+  include TestTracerHelper
+
+  def integration_name
+    :grape
+  end
+
+  def configure
+    Datadog.configure do |c|
+      c.use :grape
+    end
+  end
+
   def test_traced_api_success
     # it should trace the endpoint body
     get '/base/success'
