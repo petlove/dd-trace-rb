@@ -42,6 +42,14 @@ WebMock.disable!
 
 METHODS = (Datadog::Tracer.instance_methods - Object.instance_methods) - [:shutdown!]
 
+module TestConfig
+  module_function
+
+  def raise_on_patch_error?
+    true
+  end
+end
+
 RSpec.configure do |config|
   config.before(:each) do
     allow(Datadog::Configuration::Components).to receive(:build_tracer) do |settings|
@@ -67,7 +75,11 @@ RSpec.configure do |config|
   Datadog::Contrib::Patcher::CommonMethods.send(:prepend, Module.new do
     # Raise error during tests that fail to patch integration, instead of simply printing a warning message.
     def on_patch_error(e)
-      raise e
+      if TestConfig.raise_on_patch_error?
+        raise e
+      else
+        super
+      end
     end
   end)
 

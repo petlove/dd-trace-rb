@@ -3,6 +3,8 @@ require 'spec_helper'
 require 'ddtrace/contrib/patcher'
 
 RSpec.describe Datadog::Contrib::Patcher do
+  before { allow(TestConfig).to receive(:raise_on_patch_error?).and_return(false) }
+
   RSpec::Matchers.define :a_patch_error do |name|
     match { |actual| actual.include?("Failed to apply #{name} patch.") }
   end
