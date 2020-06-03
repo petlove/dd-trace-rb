@@ -62,7 +62,9 @@ RSpec.configure do |config|
     end
   end
 
-  Datadog::Contrib::Patcher::CommonMethods.define_method(Module.new do
+  require 'ddtrace/contrib/patcher'
+
+  Datadog::Contrib::Patcher::CommonMethods.send(:prepend, Module.new do
     # Raise error during tests that fail to patch integration, instead of simply printing a warning message.
     def on_patch_error(e)
       raise e
