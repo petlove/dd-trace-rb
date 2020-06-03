@@ -19,9 +19,34 @@ class FullStackTest < ActionDispatch::IntegrationTest
       end
 
       initialize_rails!
+    end unless Rails.application.initialized?
+
+    integration_session.instance_variable_set(:@app, Rails.application)
+
+    @tracer = Datadog.tracer
+    @tracer.writer.spans(:clear)
+
+    super
+  end
+
+  def before_setup
+    mock = -> (*_) {
+      raise "wrong tracer" if @tracer && @initialized
+      @tracer = get_test_tracer
+    }
+
+    Datadog::Configuration::Components.stub(:build_tracer, mock) do
+      Datadog.configure do |c|
+        c.use :rails
+        c.use :redis if Gem.loaded_specs['redis'] && defined?(::Redis)
+      end
+
+      initialize_rails!
 
       @initialized = true
     end unless Rails.application.initialized?
+
+    integration_session.instance_variable_set(:@app, Rails.application)
 
     @tracer = Datadog.tracer
     @tracer.writer.spans(:clear)

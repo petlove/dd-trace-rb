@@ -19,9 +19,9 @@ class TracingControllerTest < ActionController::TestCase
       end
 
       initialize_rails!
-
-      @initialized = true
     end unless Rails.application.initialized?
+
+    integration_session.instance_variable_set(:@app, Rails.application)
 
     @tracer = Datadog.tracer
     @tracer.writer.spans(:clear)
