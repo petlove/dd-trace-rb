@@ -21,9 +21,8 @@ RSpec.describe 'Redis integration test' do
   end
 
   after(:each) do
-    Datadog.configure do |c|
-      c.use :redis
-    end
+    Datadog.registry[:redis].reset_configuration!
+    Datadog.configuration.reset!
   end
 
   let(:redis) { Redis.new(host: host, port: port) }
