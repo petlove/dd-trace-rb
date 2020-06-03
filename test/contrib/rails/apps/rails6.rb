@@ -16,4 +16,6 @@ module Rails6
   end
 end
 
-Rails6::Application.test_config()
+def initialize_rails!
+  Rails6::Application.test_config()
+end

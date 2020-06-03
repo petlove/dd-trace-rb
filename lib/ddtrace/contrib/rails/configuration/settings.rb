@@ -88,6 +88,12 @@ module Datadog
           #     Datadog.configuration[:rack][:tracer] = value
           #   end
           # end
+
+          def configure(options = {})
+            super.tap do
+              Framework.setup
+            end
+          end
         end
       end
     end

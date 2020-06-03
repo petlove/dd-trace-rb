@@ -21,7 +21,9 @@ module Datadog
       module Framework
         # configure Datadog settings
         def self.setup
-          rails_config = config_with_defaults
+          rails_config = pre_initialize_config_with_defaults
+
+          # TODO we can't nest Datadog.configure
 
           # NOTE: #configure has the side effect of rebuilding trace components.
           #       During a typical Rails application lifecycle, we will see trace
@@ -30,7 +32,10 @@ module Datadog
           #       application has fully loaded, and some of this configuration is
           #       used to reconfigure tracer components with Rails-sourced defaults.
           #       This is a trade-off we take to get nice defaults.
-          Datadog.configure do |datadog_config|
+
+
+          # Datadog.configure do |datadog_config|
+          datadog_config = Datadog.configuration
             # By default, default service would be guessed from the script
             # being executed, but here we know better, get it from Rails config.
             # Don't set this if service has been explicitly provided by the user.
@@ -42,7 +47,7 @@ module Datadog
             activate_action_pack!(datadog_config, rails_config)
             activate_action_view!(datadog_config, rails_config)
             activate_active_record!(datadog_config, rails_config)
-          end
+          # end
 
           # Update the tracer if its not the default tracer.
           # if rails_config[:tracer] != Datadog.configuration.tracer
@@ -53,7 +58,7 @@ module Datadog
         def self.reconfigure
           datadog_config = Datadog.configuration
 
-          rails_config = config_with_defaults
+          rails_config = post_initialize_config_with_defaults
           datadog_config.service ||= rails_config[:service_name]
 
           reconfigure_rack!(datadog_config, rails_config)
@@ -64,7 +69,18 @@ module Datadog
           reconfigure_active_record!(datadog_config, rails_config)
         end
 
-        def self.config_with_defaults
+        def self.pre_initialize_config_with_defaults
+          # We set defaults here instead of in the patcher because we need to wait
+          # for the Rails application to be fully initialized.
+          Datadog.configuration[:rails].tap do |config|
+            config[:service_name] ||= Datadog.configuration.service
+            # config[:database_service] ||= "#{config[:service_name]}-#{Contrib::ActiveRecord::Utils.adapter_name}"
+            # config[:controller_service] ||= config[:service_name]
+            # config[:cache_service] ||= "#{config[:service_name]}-cache"
+          end
+        end
+
+        def self.post_initialize_config_with_defaults
           # We set defaults here instead of in the patcher because we need to wait
           # for the Rails application to be fully initialized.
           Datadog.configuration[:rails].tap do |config|

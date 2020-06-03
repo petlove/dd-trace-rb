@@ -1,42 +1,38 @@
 require 'helper'
 require 'minitest/around/unit'
 
-require 'rails'
-require 'rails/test_help'
+require 'contrib/rails/test_helper'
 require 'ddtrace'
 
 # rubocop:disable Metrics/ClassLength
 class FullStackTest < ActionDispatch::IntegrationTest
-  def around(&block)
+  def setup
     mock = -> (*_) {
       raise "wrong tracer" if @tracer && @initialized
       @tracer = get_test_tracer
     }
 
-    Datadog.registry[:rails].reset_configuration!
-    Datadog.configuration[:rails].reset_options!
-
     Datadog::Configuration::Components.stub(:build_tracer, mock) do
-      Datadog.configure {}
-      require 'contrib/rails/test_helper'
-
       Datadog.configure do |c|
         c.use :rails
+        c.use :redis if Gem.loaded_specs['redis'] && defined?(::Redis)
       end
+
+      initialize_rails!
 
       @initialized = true
       @tracer = Datadog.tracer
       @tracer.writer.spans(:clear)
-
-      block.call
     end
+  end
 
+  def teardown
     Datadog.registry[:rails].reset_configuration!
     Datadog.configuration[:rails].reset_options!
   end
 
   def spans
-    @spans ||= @tracer.writer.spans(:keep).reject { |x| x.resource == 'BEGIN' }
+    @spans ||= @tracer.writer.spans(:clear).reject { |x| x.resource == 'BEGIN' }
   end
 
   test 'a full request is properly traced' do

@@ -80,7 +80,11 @@ module Datadog
 
         # Configure Rails tracing with settings
         def setup_tracer
-          Datadog::Contrib::Rails::Framework.setup
+          if patched?
+            Datadog::Contrib::Rails::Framework.reconfigure
+          else
+            Datadog::Contrib::Rails::Framework.setup
+          end
         end
       end
     end
