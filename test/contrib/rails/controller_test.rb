@@ -6,7 +6,7 @@ require 'ddtrace'
 
 # rubocop:disable Metrics/ClassLength
 class TracingControllerTest < ActionController::TestCase
-  def setup
+  def before_setup
     mock = -> (*_) {
       raise "wrong tracer" if @tracer && @initialized
       @tracer = get_test_tracer
@@ -21,14 +21,12 @@ class TracingControllerTest < ActionController::TestCase
       initialize_rails!
 
       @initialized = true
-      @tracer = Datadog.tracer
-      @tracer.writer.spans(:clear)
-    end
-  end
+    end unless Rails.application.initialized?
 
-  def teardown
-    Datadog.registry[:rails].reset_configuration!
-    Datadog.configuration[:rails].reset_options!
+    @tracer = Datadog.tracer
+    @tracer.writer.spans(:clear)
+
+    super
   end
 
   def spans
