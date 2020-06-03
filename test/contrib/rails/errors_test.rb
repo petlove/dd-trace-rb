@@ -3,6 +3,9 @@ require 'minitest/around/unit'
 
 require 'rails'
 require 'rails/test_help'
+
+require 'contrib/rails/test_helper'
+
 require 'ddtrace'
 
 # rubocop:disable Metrics/ClassLength
@@ -14,8 +17,11 @@ class TracingControllerTest < ActionController::TestCase
     }
 
     Datadog::Configuration::Components.stub(:build_tracer, mock) do
-      Datadog.configure {}
-      require 'contrib/rails/test_helper'
+      # Enables the auto-instrumentation for the testing application
+      Datadog.configure do |c|
+        c.use :rails
+        c.use :redis if Gem.loaded_specs['redis'] && defined?(::Redis)
+      end
 
       @initialized = true
       @tracer = Datadog.tracer

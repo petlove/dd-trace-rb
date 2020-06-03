@@ -15,11 +15,11 @@ class Rails3 < Rails::Application
   config.middleware.delete ActionDispatch::DebugExceptions if Rails.version >= '3.2.22.5'
 end
 
-# Enables the auto-instrumentation for the testing application
-Datadog.configure do |c|
-  c.use :rails
-  c.use :redis if Gem.loaded_specs['redis'] && defined?(::Redis)
-end
+# # Enables the auto-instrumentation for the testing application
+# Datadog.configure do |c|
+#   c.use :rails
+#   c.use :redis if Gem.loaded_specs['redis'] && defined?(::Redis)
+# end
 
 # Initialize the Rails application
 require 'contrib/rails/apps/routes'
