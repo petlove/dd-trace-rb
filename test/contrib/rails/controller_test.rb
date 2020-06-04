@@ -6,32 +6,7 @@ require 'ddtrace'
 
 # rubocop:disable Metrics/ClassLength
 class TracingControllerTest < ActionController::TestCase
-  def before_setup
-    mock = -> (*_) {
-      raise "wrong tracer" if @tracer && @initialized
-      @tracer = get_test_tracer
-    }
-
-    Datadog::Configuration::Components.stub(:build_tracer, mock) do
-      Datadog.configure do |c|
-        c.use :rails
-        c.use :redis if Gem.loaded_specs['redis'] && defined?(::Redis)
-      end
-
-      initialize_rails!
-    end unless Rails.application.initialized?
-
-    integration_session.instance_variable_set(:@app, Rails.application)
-
-    @tracer = Datadog.tracer
-    @tracer.writer.spans(:clear)
-
-    super
-  end
-
-  def spans
-    @spans ||= @tracer.writer.spans(:clear).reject { |x| x.resource == 'BEGIN' }
-  end
+  include RailsTest
 
   test 'request is properly traced' do
     # make the request and assert the proper span

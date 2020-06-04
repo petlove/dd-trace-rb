@@ -30,3 +30,6 @@ def initialize_rails!
   require 'contrib/rails/apps/models'
 end
 
+def rails_initialized?
+  Rails.initialized? if Rails.class_variable_defined?(:@@initialized)
+end
