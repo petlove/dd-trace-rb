@@ -136,7 +136,7 @@ MESSAGE
     end
   end
 
-  context '#write' do
+  context '#delete' do
     subject!(:write) { cache.delete(key) }
 
     it do

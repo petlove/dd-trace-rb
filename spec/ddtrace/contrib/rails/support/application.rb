@@ -67,7 +67,7 @@ RSpec.shared_context 'Rails test application' do
     logger.error 'A Rails app for this version is not found!'
   end
 
-  let(:tracer_options) { { tracer: tracer } }
+  let(:tracer_options) { { } }
 
   let(:app_name) { Datadog::Contrib::Rails::Utils.app_name }
 
