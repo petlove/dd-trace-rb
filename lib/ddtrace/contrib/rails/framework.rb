@@ -48,17 +48,18 @@ module Datadog
             activate_action_view!(datadog_config, rails_config)
             activate_active_record!(datadog_config, rails_config)
           # end
-
-          # Update the tracer if its not the default tracer.
-          # if rails_config[:tracer] != Datadog.configuration.tracer
-          #   rails_config[:tracer].default_service = rails_config[:service_name]
-          # end
         end
 
         def self.reconfigure
           datadog_config = Datadog.configuration
 
           rails_config = post_initialize_config_with_defaults
+
+          # Update the global :service if not set
+          unless datadog_config.service
+            rails_config[:tracer].default_service = rails_config[:service_name]
+          end
+
           datadog_config.service ||= rails_config[:service_name]
 
           reconfigure_rack!(datadog_config, rails_config)
