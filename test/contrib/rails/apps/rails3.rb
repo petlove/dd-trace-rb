@@ -28,8 +28,12 @@ require 'contrib/rails/apps/controllers'
 def initialize_rails!
   Rails3.initialize!
   require 'contrib/rails/apps/models'
+
+  # Rails < 4 doesn't keep good track internally if it's been
+  # initialized or not, so we have to do it.
+  Rails.instance_variable_set(:@dd_rails_initialized, true)
 end
 
 def rails_initialized?
-  Rails.initialized? if Rails.class_variable_defined?(:@@initialized)
+  Rails.instance_variable_get(:@dd_rails_initialized)
 end

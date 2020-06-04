@@ -120,9 +120,11 @@ module RailsTest
       end
 
       initialize_rails!
-    end unless rails_initialized?
 
-    if defined? integration_session
+      @initialized = true
+    end if !@initialized && !rails_initialized?
+
+    if defined?(integration_session) && integration_session
       integration_session.instance_variable_set(:@app, Rails.application)
     end
 
