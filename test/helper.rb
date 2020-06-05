@@ -253,25 +253,37 @@ module TestTracerHelper
       @tracer = get_test_tracer
     }
 
-    Datadog.registry[integration_name].reset_configuration!
-    Datadog.configuration[integration_name].reset_options!
+    if integration_name
+      Datadog.registry[integration_name].reset_configuration!
+      Datadog.configuration[integration_name].reset_options!
+    end
 
     Datadog::Configuration::Components.stub(:build_tracer, mock) do
       configure
 
       @initialized = true
       @tracer = Datadog.tracer
-      @tracer.writer.spans(:clear)
+      @writer = @tracer.writer
+
+      @writer.spans(:clear)
 
       block.call
     end
 
-    Datadog.registry[integration_name].reset_configuration!
-    Datadog.configuration[integration_name].reset_options!
+    if integration_name
+      Datadog.registry[integration_name].reset_configuration!
+      Datadog.configuration[integration_name].reset_options!
+    end
   end
 
   def spans
     @spans ||= @tracer.writer.spans(:keep)
+  end
+
+  def integration_name
+  end
+
+  def configure
   end
 end
 

@@ -18,8 +18,7 @@ class ClientTracerTest < TracerTestBase
       config.client_middleware.clear
 
       config.client_middleware do |chain|
-        chain.add(Datadog::Contrib::Sidekiq::ClientTracer,
-                  tracer: @tracer, enabled: true)
+        chain.add(Datadog::Contrib::Sidekiq::ClientTracer, enabled: true)
       end
     end
 
