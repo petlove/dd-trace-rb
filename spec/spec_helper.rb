@@ -52,6 +52,27 @@ end
 
 RSpec.configure do |config|
   config.before(:each) do
+    allow_any_instance_of(Datadog::Pin)
+      .to receive(:deprecation_warning)
+            .and_raise('Tracer cannot be eagerly cached. In production this is just a warning.')
+
+
+    allow_any_instance_of(Datadog::Configuration::Option)
+      .to receive(:set).and_wrap_original do |original_method, value|
+
+      option = original_method.receiver
+
+      require 'rspec/mocks/test_double'
+      if !(option.definition.class < RSpec::Mocks::TestDouble) && option.definition.name == :tracer && !(value.class < Datadog::Configuration::Base) && !value.instance_variable_get(:@dd_use_real_tracer)
+        raise 'Eagerly setting tracer is not allowed'
+      end
+
+      original_method.call(value)
+    end
+  end
+
+
+  config.before(:each) do
     allow(Datadog::Configuration::Components).to receive(:build_tracer) do |settings|
       if @tracer
         METHODS.each do |method|

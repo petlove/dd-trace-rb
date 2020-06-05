@@ -45,9 +45,13 @@ RSpec.describe Datadog::Pin do
       let(:options) { super().merge(tracer: tracer_option) }
       let(:tracer_option) { get_test_tracer }
 
-      # TODO implement when moved from error to warning
-      xit 'expect a deprecation warning' do
-        expect { subject }.to output("warning").to_stderr
+      before do
+        allow_any_instance_of(Datadog::Pin).to receive(:deprecation_warning).and_call_original
+      end
+
+      it 'expect a deprecation warning' do
+        expect(Datadog.logger).to receive(:warn).with(include('DEPRECATED'))
+        subject
       end
     end
 

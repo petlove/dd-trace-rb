@@ -25,8 +25,7 @@ module Datadog
     alias service service_name
 
     def initialize(service_name, options = {})
-      # TODO change to deprecation warning
-      raise "Tracer cannot be eagerly cached." unless options[:tracer].is_a?(Proc) || options[:tracer].nil?
+      deprecation_warning unless options[:tracer].is_a?(Proc) || options[:tracer].nil?
 
       @app = options[:app]
       @app_type = options[:app_type]
@@ -69,6 +68,27 @@ module Datadog
 
     def to_s
       "Pin(service:#{service},app:#{app},app_type:#{app_type},name:#{name})"
+    end
+
+    private
+
+    DEPRECATION_WARNING = %(
+      Explicitly providing a tracer instance is DEPRECATED.
+      It's recommended to not provide an explicit tracer instance
+      and let Datadog::Pin resolve the correct tracer internally.
+      ).freeze
+
+    def deprecation_warning
+      log_deprecation_warning('Datadog::Pin.new')
+    end
+
+    include Datadog::Patcher
+
+    def log_deprecation_warning(method_name)
+      # Only log each deprecation warning once (safeguard against log spam)
+      do_once(method_name) do
+        Datadog.logger.warn("#{method_name}:#{DEPRECATION_WARNING}")
+      end
     end
   end
 
