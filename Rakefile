@@ -193,6 +193,9 @@ task :ci do
 
     original_sh = method(:sh)
     define_singleton_method(:sh) do |*cmd, &block|
+      return original_sh.call(*cmd, &block) if total_nodes == 1
+
+      # Keep Rails tests serial, as they compete for database resources
       if cmd[0].include?('rails')
         if current_node == (total_nodes - 1)
           original_sh.call(*cmd, &block)
