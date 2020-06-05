@@ -44,9 +44,9 @@ class ServerTracerTest < TracerTestBase
     EmptyWorker.perform_async()
 
     spans = @writer.spans()
-    assert_equal(1, spans.length)
+    assert_equal(2, spans.length)
 
-    span = spans[0]
+    span, _push = spans
     assert_equal('sidekiq', span.service)
     assert_equal('ServerTracerTest::EmptyWorker', span.resource)
     assert_equal('default', span.get_tag('sidekiq.job.queue'))
@@ -65,9 +65,9 @@ class ServerTracerTest < TracerTestBase
     end
 
     spans = @writer.spans()
-    assert_equal(1, spans.length)
+    assert_equal(2, spans.length)
 
-    span = spans[0]
+    span, _push = spans
     assert_equal('sidekiq', span.service)
     assert_equal('ServerTracerTest::ErrorWorker', span.resource)
     assert_equal('default', span.get_tag('sidekiq.job.queue'))
@@ -85,9 +85,9 @@ class ServerTracerTest < TracerTestBase
     CustomWorker.perform_async('random_id')
 
     spans = @writer.spans()
-    assert_equal(2, spans.length)
+    assert_equal(4, spans.length)
 
-    custom, empty = spans
+    custom, empty, _push, _push = spans
 
     assert_equal('sidekiq', empty.service)
     assert_equal('ServerTracerTest::EmptyWorker', empty.resource)

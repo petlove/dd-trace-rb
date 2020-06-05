@@ -12,6 +12,10 @@ class TracerTestBase < Minitest::Test
   REDIS_PORT = ENV.fetch('TEST_REDIS_PORT', 6379)
 
   def configure
+    Datadog.configure do |c|
+      c.use :sidekiq
+    end
+
     redis_url = "redis://#{REDIS_HOST}:#{REDIS_PORT}"
 
     Sidekiq.configure_client do |config|
