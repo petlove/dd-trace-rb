@@ -3,7 +3,11 @@ require 'spec_helper'
 require 'ddtrace/contrib/patcher'
 
 RSpec.describe Datadog::Contrib::Patcher do
-  before { allow(TestConfig).to receive(:raise_on_patch_error?).and_return(false) }
+  before do
+    # DEV Resetting with +.and_call_original+ is currently raising a stack overflow error.
+    # DEV This seems like a bug in RSpec that we should investigate further.
+    RSpec::Mocks.space.any_instance_proxy_for(Datadog::Contrib::Patcher::CommonMethods).unstub(:on_patch_error)
+  end
 
   RSpec::Matchers.define :a_patch_error do |name|
     match { |actual| actual.include?("Failed to apply #{name} patch.") }

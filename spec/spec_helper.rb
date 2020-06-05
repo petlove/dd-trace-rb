@@ -55,20 +55,22 @@ RSpec.configure do |config|
     allow_any_instance_of(Datadog::Pin)
       .to receive(:deprecation_warning)
             .and_raise('Tracer cannot be eagerly cached. In production this is just a warning.')
-
-
+    
+    require 'rspec/mocks/test_double'
     allow_any_instance_of(Datadog::Configuration::Option)
       .to receive(:set).and_wrap_original do |original_method, value|
 
       option = original_method.receiver
 
-      require 'rspec/mocks/test_double'
       if !(option.definition.class < RSpec::Mocks::TestDouble) && option.definition.name == :tracer && !(value.class < Datadog::Configuration::Base) && !value.instance_variable_get(:@dd_use_real_tracer)
         raise 'Eagerly setting tracer is not allowed'
       end
 
       original_method.call(value)
     end
+
+    require 'ddtrace/contrib/patcher'
+    allow_any_instance_of(Datadog::Contrib::Patcher::CommonMethods).to(receive(:on_patch_error)) { |_, e| raise e }
   end
 
 
@@ -90,19 +92,6 @@ RSpec.configure do |config|
       )
     end
   end
-
-  require 'ddtrace/contrib/patcher'
-
-  Datadog::Contrib::Patcher::CommonMethods.send(:prepend, Module.new do
-    # Raise error during tests that fail to patch integration, instead of simply printing a warning message.
-    def on_patch_error(e)
-      if TestConfig.raise_on_patch_error?
-        raise e
-      else
-        super
-      end
-    end
-  end)
 
   config.include ConfigurationHelpers
   config.include ContainerHelpers
