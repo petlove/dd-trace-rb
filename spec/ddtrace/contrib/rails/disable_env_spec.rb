@@ -35,6 +35,10 @@ MESSAGE
     end)
   end
 
+  before do
+    Datadog.configure {}
+  end
+
   it 'does not instrument' do
     # make the request and assert the proper span
     get '/'
@@ -43,8 +47,6 @@ MESSAGE
   end
 
   it 'manual instrumentation should still work' do
-    Datadog.configure {} # TODO move to the right place
-
     tracer.trace('a-test') {}
     expect(spans).to have(1).item
   end

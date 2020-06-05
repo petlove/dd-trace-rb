@@ -55,7 +55,7 @@ RSpec.configure do |config|
     allow_any_instance_of(Datadog::Pin)
       .to receive(:deprecation_warning)
             .and_raise('Tracer cannot be eagerly cached. In production this is just a warning.')
-    
+
     require 'rspec/mocks/test_double'
     allow_any_instance_of(Datadog::Configuration::Option)
       .to receive(:set).and_wrap_original do |original_method, value|
