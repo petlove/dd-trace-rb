@@ -168,7 +168,7 @@ orbs:
           - *container_mongo
           - *container_memcached
           - *container_agent
-        parallelism: 7
+        parallelism: 10
         steps:
           - restore_cache:
               keys:
