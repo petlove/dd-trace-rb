@@ -193,14 +193,27 @@ task :ci do
 
     original_sh = method(:sh)
     define_singleton_method(:sh) do |*cmd, &block|
-      return original_sh.call(*cmd, &block) if total_nodes == 1
+      command = cmd[0]
+
+      if total_nodes <= 2
+        if total_nodes == 2
+          puts "Not enough nodes to parallelize database tests"
+          puts "Running all test serially"
+        end
+
+        original_sh.call(*cmd, &block)
+      end
 
       # Keep Rails tests serial, as they compete for database resources
-      if cmd[0].include?('rails')
+      if command.include?('mysql')
         if current_node == (total_nodes - 1)
           original_sh.call(*cmd, &block)
         end
-      elsif cmd[0].hash % (total_nodes - 1) == current_node
+      elsif command.include?('postgres')
+        if current_node == (total_nodes - 2)
+          original_sh.call(*cmd, &block)
+        end
+      elsif command.hash % (total_nodes - 2) == current_node
         original_sh.call(*cmd, &block)
       end
     end
