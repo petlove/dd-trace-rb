@@ -193,7 +193,11 @@ task :ci do
 
     original_sh = method(:sh)
     define_singleton_method(:sh) do |*cmd, &block|
-      if cmd[0].hash % total_nodes == current_node
+      if cmd[0].include?('rails')
+        if current_node == (total_nodes - 1)
+          original_sh.call(*cmd, &block)
+        end
+      elsif cmd[0].hash % (total_nodes - 1) == current_node
         original_sh.call(*cmd, &block)
       end
     end
