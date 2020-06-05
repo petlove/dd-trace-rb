@@ -158,7 +158,7 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
         before(:each) do
           Datadog.configure do |c|
             c.use :active_record, describes: mysql_connection_string do |gadget_db|
-              gadget_db.tracer = tracer
+              # gadget_db.tracer = tracer
               gadget_db.service_name = gadget_db_service_name
             end
           end
@@ -176,7 +176,7 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
         before(:each) do
           Datadog.configure do |c|
             c.use :active_record, describes: 'sqlite3::memory:' do |widget_db|
-              widget_db.tracer = tracer
+              # widget_db.tracer = tracer
               widget_db.service_name = widget_db_service_name
             end
           end
@@ -197,7 +197,7 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
 
         Datadog.configure do |c|
           c.use :active_record, describes: widget_db_connection_hash do |widget_db|
-            widget_db.tracer = tracer
+            # widget_db.tracer = tracer
             widget_db.service_name = widget_db_service_name
           end
         end
