@@ -8,7 +8,9 @@ require 'ddtrace'
 RSpec.describe 'Redis integration test' do
   # Use real tracer
   let(:tracer) do
-    Datadog::Tracer.new
+    Datadog::Tracer.new.tap do |t|
+      t.instance_variable_set(:@dd_use_real_tracer, true)
+    end
   end
 
   before(:each) do
