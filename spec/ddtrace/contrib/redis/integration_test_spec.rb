@@ -6,19 +6,13 @@ require 'hiredis'
 require 'ddtrace'
 
 RSpec.describe 'Redis integration test' do
-  # Use real tracer
-  let(:tracer) do
-    Datadog::Tracer.new.tap do |t|
-      t.instance_variable_set(:@dd_use_real_tracer, true)
-    end
-  end
-
   before(:each) do
     skip unless ENV['TEST_DATADOG_INTEGRATION']
 
-    # Make sure to reset default tracer
+    use_real_tracer!
+
     Datadog.configure do |c|
-      c.use :redis, tracer: tracer
+      c.use :redis
     end
   end
 

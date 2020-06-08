@@ -49,4 +49,33 @@ module ConfigurationHelpers
         .instance_variable_set('@patched', false)
     end
   end
+
+  def self.included(config)
+    config.before(:each) do
+      allow_any_instance_of(Datadog::Pin)
+        .to receive(:deprecation_warning)
+        .and_raise('DEPRECATED: Tracer cannot be eagerly cached.' \
+      'A warning will be emitted in production for such cases.')
+    end
+
+    # Ensure that +configuration.tracer=+ is never invoked during tests.
+    # We don't want to support eagerly caching tracer instances.
+    config.before(:each) do
+      require 'rspec/mocks/test_double' # Ensure +RSpec::Mocks::TestDouble+ is loaded
+
+      allow_any_instance_of(Datadog::Configuration::Option)
+        .to receive(:set).and_wrap_original do |original_method, value|
+
+        option = original_method.receiver
+
+        if option.definition.class >= RSpec::Mocks::TestDouble && # This is not a real option, just a mock
+           option.definition.name == :tracer # We only care about +tracer=+
+
+          raise 'Eagerly setting tracer is not allowed'
+        end
+
+        original_method.call(value)
+      end
+    end
+  end
 end

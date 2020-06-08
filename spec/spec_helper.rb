@@ -24,6 +24,8 @@ require 'support/spy_transport'
 require 'support/synchronization_helpers'
 require 'support/tracer_helpers'
 
+require 'ddtrace/contrib/support/contrib_helpers'
+
 begin
   # Ignore interpreter warnings from external libraries
   require 'warning'
@@ -41,60 +43,6 @@ WebMock.allow_net_connect!
 WebMock.disable!
 
 RSpec.configure do |config|
-  config.before(:each) do
-    allow_any_instance_of(Datadog::Pin)
-      .to receive(:deprecation_warning)
-      .and_raise('Tracer cannot be eagerly cached. In production this is just a warning.')
-
-    require 'rspec/mocks/test_double'
-    allow_any_instance_of(Datadog::Configuration::Option)
-      .to receive(:set).and_wrap_original do |original_method, value|
-
-      option = original_method.receiver
-
-      if option.definition.class >= RSpec::Mocks::TestDouble &&
-         option.definition.name == :tracer &&
-         value.class >= Datadog::Configuration::Base &&
-         !value.instance_variable_get(:@dd_use_real_tracer)
-
-        raise 'Eagerly setting tracer is not allowed'
-      end
-
-      original_method.call(value)
-    end
-
-    require 'ddtrace/contrib/patcher'
-    allow_any_instance_of(Datadog::Contrib::Patcher::CommonMethods).to(receive(:on_patch_error)) { |_, e| raise e }
-  end
-
-  config.before(:each) do
-    allow(Datadog::Configuration::Components).to receive(:build_tracer) do |settings|
-      if @tracer
-        # We monitor and raise errors on all methods calls to stale tracer instances.
-        # We allow #shutdown! to be called though, as finalizing a stale instance is allowed.
-        methods = (Datadog::Tracer.instance_methods - Object.instance_methods) - [:shutdown!]
-        methods.each do |method|
-          allow(@tracer).to receive(method).and_raise(
-            "Stale tracer instance: superseded during reconfiguration at #{caller.drop(2).join("\n")}"
-          )
-        end
-      end
-
-      @tracer = get_test_tracer(default_service: settings.service,
-                                enabled: settings.tracer.enabled,
-                                partial_flush: settings.tracer.partial_flush.enabled,
-                                tags: settings.tags.dup.tap do |tags|
-                                  tags['env'] = settings.env unless settings.env.nil?
-                                  tags['version'] = settings.version unless settings.version.nil?
-                                end)
-    end
-  end
-
-  config.before(:each) do
-    Datadog.shutdown!
-    Datadog.configuration.reset!
-  end
-
   config.include ConfigurationHelpers
   config.include ContainerHelpers
   config.include HealthMetricHelpers
@@ -105,6 +53,13 @@ RSpec.configure do |config|
   config.include SpanHelpers
   config.include SynchronizationHelpers
   config.include TracerHelpers
+
+  # Contrib specific helper code
+  # TODO: We don't need to load this for non-contrib tests.
+  # TODO: We should have all contrib tests require 'spec_contrib_helper',
+  # TODO: instead of 'spec_helper', but this requires touching all contrib
+  # TODO: test files.
+  config.include ContribHelpers
 
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
