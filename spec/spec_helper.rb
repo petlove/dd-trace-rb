@@ -40,16 +40,6 @@ end
 WebMock.allow_net_connect!
 WebMock.disable!
 
-METHODS = (Datadog::Tracer.instance_methods - Object.instance_methods) - [:shutdown!]
-
-module TestConfig
-  module_function
-
-  def raise_on_patch_error?
-    true
-  end
-end
-
 RSpec.configure do |config|
   config.before(:each) do
     allow_any_instance_of(Datadog::Pin)
@@ -80,7 +70,10 @@ RSpec.configure do |config|
   config.before(:each) do
     allow(Datadog::Configuration::Components).to receive(:build_tracer) do |settings|
       if @tracer
-        METHODS.each do |method|
+        # We monitor and raise errors on all methods calls to stale tracer instances.
+        # We allow #shutdown! to be called though, as finalizing a stale instance is allowed.
+        methods = (Datadog::Tracer.instance_methods - Object.instance_methods) - [:shutdown!]
+        methods.each do |method|
           allow(@tracer).to receive(method).and_raise(
             "Stale tracer instance: superseded during reconfiguration at #{caller.drop(2).join("\n")}"
           )
