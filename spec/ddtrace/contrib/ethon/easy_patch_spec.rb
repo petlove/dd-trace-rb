@@ -5,7 +5,7 @@ require 'ddtrace/contrib/analytics_examples'
 
 RSpec.describe Datadog::Contrib::Ethon::EasyPatch do
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   before do
     Datadog.configure do |c|

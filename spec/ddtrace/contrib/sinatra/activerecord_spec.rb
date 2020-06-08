@@ -12,7 +12,7 @@ RSpec.describe 'Sinatra instrumentation with ActiveRecord' do
   include Rack::Test::Methods
 
   # let(:tracer) { get_test_tracer }
-  let(:options) { { } }
+  let(:options) { {} }
 
   let(:span) { spans.first }
   let(:spans) { tracer.writer.spans }

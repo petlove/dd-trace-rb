@@ -11,9 +11,7 @@ module Datadog
         option :analytics_sample_rate, default: 1.0
         option :service_name
         option :tracer do |o|
-          o.delegate_to {
-            Datadog.tracer
-          }
+          o.delegate_to { Datadog.tracer }
         end
 
         def configure(options = {})

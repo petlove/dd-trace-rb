@@ -197,8 +197,8 @@ task :ci do
 
       if total_nodes <= 2
         if total_nodes == 2
-          puts "Not enough nodes to parallelize database tests"
-          puts "Running all test serially"
+          puts 'Not enough nodes to parallelize database tests'
+          puts 'Running all test serially'
         end
 
         original_sh.call(*cmd, &block)
@@ -206,13 +206,9 @@ task :ci do
 
       # Keep Rails tests serial, as they compete for database resources
       if command.include?('mysql')
-        if current_node == (total_nodes - 1)
-          original_sh.call(*cmd, &block)
-        end
+        original_sh.call(*cmd, &block) if current_node == (total_nodes - 1)
       elsif command.include?('postgres')
-        if current_node == (total_nodes - 2)
-          original_sh.call(*cmd, &block)
-        end
+        original_sh.call(*cmd, &block) if current_node == (total_nodes - 2)
       elsif command.hash % (total_nodes - 2) == current_node
         original_sh.call(*cmd, &block)
       end

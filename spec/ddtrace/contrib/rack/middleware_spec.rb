@@ -9,7 +9,7 @@ RSpec.describe Datadog::Contrib::Rack::TraceMiddleware do
   let(:app) { instance_double(Rack::Builder) }
 
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   before(:each) do
     Datadog.configure do |c|

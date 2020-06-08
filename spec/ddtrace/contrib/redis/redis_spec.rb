@@ -8,7 +8,7 @@ require 'ddtrace'
 
 RSpec.describe 'Redis test' do
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   def all_spans
     tracer.writer.spans(:keep)

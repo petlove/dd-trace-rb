@@ -19,7 +19,7 @@ RSpec.describe 'ActionCable Rack override' do
   # # let(:tracer) { get_test_tracer }
   let(:spans) { tracer.writer.spans(:keep) }
 
-  let(:options) { {  } }
+  let(:options) { {} }
 
   before do
     Datadog.configure do |c|

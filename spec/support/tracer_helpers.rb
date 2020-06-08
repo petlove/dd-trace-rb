@@ -4,9 +4,9 @@ require 'support/faux_writer'
 
 # rubocop:disable Metrics/ModuleLength
 module TracerHelpers
-  # Return a test tracer instance with a faux writer.
+  # Returns the current tracer instance
   def tracer
-    @tracer ||= new_tracer
+    @tracer || instance_double(Datadog::Tracer, 'Bad tracer instance: created before Datadog.configure')
   end
 
   def new_tracer(options = {})
@@ -151,9 +151,5 @@ module TracerHelpers
 
     @spans = nil
     @span = nil
-  end
-
-  def tracer
-    @tracer || instance_double(Datadog::Tracer, 'wrong tracer: from before Datadog.configure')
   end
 end

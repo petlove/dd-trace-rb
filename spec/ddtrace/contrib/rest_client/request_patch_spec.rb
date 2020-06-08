@@ -8,7 +8,7 @@ require 'restclient/request'
 
 RSpec.describe Datadog::Contrib::RestClient::RequestPatch do
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   before do
     Datadog.configure do |c|

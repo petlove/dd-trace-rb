@@ -185,9 +185,7 @@ end
 
 # FauxTransport is a dummy Datadog::Transport that doesn't send data to an agent.
 class FauxTransport < Datadog::Transport::HTTP::Client
-  def initialize(*)
-    ;
-  end
+  def initialize(*); end
 
   def send_traces(*)
     # Emulate an OK response
@@ -248,8 +246,8 @@ require 'minitest/around/unit'
 
 module TestTracerHelper
   def around(&block)
-    mock = -> (*_) {
-      raise "wrong tracer" if @tracer && @initialized
+    mock = lambda { |*_|
+      raise 'wrong tracer' if @tracer && @initialized
       @tracer = get_test_tracer
     }
 
@@ -267,7 +265,7 @@ module TestTracerHelper
 
       @writer.spans(:clear)
 
-      block.call
+      yield
     end
 
     if integration_name
@@ -280,11 +278,9 @@ module TestTracerHelper
     @spans ||= @tracer.writer.spans(:keep)
   end
 
-  def integration_name
-  end
+  def integration_name; end
 
-  def configure
-  end
+  def configure; end
 end
 
 require 'ddtrace/contrib/patcher'

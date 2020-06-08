@@ -7,7 +7,7 @@ require 'active_support'
 require 'ddtrace'
 RSpec.describe 'Racecar patcher' do
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   def all_spans
     tracer.writer.spans(:keep)

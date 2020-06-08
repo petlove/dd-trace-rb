@@ -156,7 +156,7 @@ RSpec.shared_examples_for 'analytics for integration' do |options = { ignore_glo
   shared_context 'analytics setting' do |analytics_enabled|
     let(:analytics_enabled) { defined?(super) ? super() : analytics_enabled }
 
-    before { Datadog.configuration.analytics.enabled = self.analytics_enabled }
+    before { Datadog.configuration.analytics.enabled = analytics_enabled }
     after { Datadog.configuration.reset! }
   end
 

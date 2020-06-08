@@ -12,7 +12,7 @@ RSpec.describe 'ActiveModelSerializers patcher' do
   include_context 'AMS serializer'
 
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   def all_spans
     tracer.writer.spans(:keep)

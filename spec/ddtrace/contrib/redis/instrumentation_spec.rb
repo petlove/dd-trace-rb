@@ -10,7 +10,7 @@ RSpec.describe 'Redis instrumentation test' do
 
   let(:client) { Redis.new(host: test_host, port: test_port) }
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   def all_spans
     tracer.writer.spans(:keep)

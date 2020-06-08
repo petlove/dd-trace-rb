@@ -10,7 +10,7 @@ RSpec.describe 'Rack integration tests' do
   include Rack::Test::Methods
 
   # let(:tracer) { get_test_tracer }
-  let(:rack_options) { { } }
+  let(:rack_options) { {} }
 
   let(:spans) { tracer.writer.spans }
   let(:span) { spans.first }

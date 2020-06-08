@@ -54,7 +54,7 @@ RSpec.configure do |config|
   config.before(:each) do
     allow_any_instance_of(Datadog::Pin)
       .to receive(:deprecation_warning)
-            .and_raise('Tracer cannot be eagerly cached. In production this is just a warning.')
+      .and_raise('Tracer cannot be eagerly cached. In production this is just a warning.')
 
     require 'rspec/mocks/test_double'
     allow_any_instance_of(Datadog::Configuration::Option)
@@ -62,7 +62,11 @@ RSpec.configure do |config|
 
       option = original_method.receiver
 
-      if !(option.definition.class < RSpec::Mocks::TestDouble) && option.definition.name == :tracer && !(value.class < Datadog::Configuration::Base) && !value.instance_variable_get(:@dd_use_real_tracer)
+      if option.definition.class >= RSpec::Mocks::TestDouble &&
+         option.definition.name == :tracer &&
+         value.class >= Datadog::Configuration::Base &&
+         !value.instance_variable_get(:@dd_use_real_tracer)
+
         raise 'Eagerly setting tracer is not allowed'
       end
 
@@ -73,12 +77,13 @@ RSpec.configure do |config|
     allow_any_instance_of(Datadog::Contrib::Patcher::CommonMethods).to(receive(:on_patch_error)) { |_, e| raise e }
   end
 
-
   config.before(:each) do
     allow(Datadog::Configuration::Components).to receive(:build_tracer) do |settings|
       if @tracer
         METHODS.each do |method|
-          allow(@tracer).to receive(method).and_raise("wrong tracer")
+          allow(@tracer).to receive(method).and_raise(
+            "Stale tracer instance: superseded during reconfiguration at #{caller.drop(2).join("\n")}"
+          )
         end
       end
 
@@ -88,8 +93,7 @@ RSpec.configure do |config|
                                 tags: settings.tags.dup.tap do |tags|
                                   tags['env'] = settings.env unless settings.env.nil?
                                   tags['version'] = settings.version unless settings.version.nil?
-                                end
-      )
+                                end)
     end
   end
 

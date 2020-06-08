@@ -10,7 +10,7 @@ RSpec.describe Datadog::Contrib::Excon::Middleware do
 
   let(:connection_options) { { mock: true } }
   let(:middleware_options) { {} }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   let(:request_span) do
     tracer.writer.spans(:keep).find { |span| span.name == Datadog::Contrib::Excon::Ext::SPAN_REQUEST }

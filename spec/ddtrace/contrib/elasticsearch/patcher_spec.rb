@@ -10,7 +10,7 @@ RSpec.describe Datadog::Contrib::Elasticsearch::Patcher do
   let(:server) { "http://#{host}:#{port}" }
 
   let(:client) { Elasticsearch::Client.new(url: server) }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
   # let(:tracer) { get_test_tracer }
 
   before do

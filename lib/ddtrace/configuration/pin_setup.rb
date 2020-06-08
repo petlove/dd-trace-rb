@@ -23,7 +23,7 @@ module Datadog
       attr_reader :pin, :opts
 
       ATTRS = [:app, :tags, :app_type, :name, :service_name].freeze
-      DEPRECATED_ATTRS = [:tracer]
+      DEPRECATED_ATTRS = [:tracer].freeze
 
       private_constant :ATTRS
     end

@@ -272,18 +272,18 @@ module Datadog
         begin
           begin
             span = start_span(name, options)
-              # rubocop:disable Lint/UselessAssignment
+          # rubocop:disable Lint/UselessAssignment
           rescue StandardError => e
             Datadog.logger.debug('Failed to start span: #{e}')
           ensure
             return_value = yield(span)
           end
-            # rubocop:disable Lint/RescueException
-            # Here we really want to catch *any* exception, not only StandardError,
-            # as we really have no clue of what is in the block,
-            # and it is user code which should be executed no matter what.
-            # It's not a problem since we re-raise it afterwards so for example a
-            # SignalException::Interrupt would still bubble up.
+        # rubocop:disable Lint/RescueException
+        # Here we really want to catch *any* exception, not only StandardError,
+        # as we really have no clue of what is in the block,
+        # and it is user code which should be executed no matter what.
+        # It's not a problem since we re-raise it afterwards so for example a
+        # SignalException::Interrupt would still bubble up.
         rescue Exception => e
           (options[:on_error] || DEFAULT_ON_ERROR).call(span, e)
           raise e

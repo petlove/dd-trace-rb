@@ -11,7 +11,7 @@ RSpec.describe 'Dalli instrumentation' do
 
   let(:client) { ::Dalli::Client.new("#{test_host}:#{test_port}") }
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   def all_spans
     tracer.writer.spans(:keep)

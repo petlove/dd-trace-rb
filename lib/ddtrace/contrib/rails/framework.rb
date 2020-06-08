@@ -18,12 +18,14 @@ module Datadog
       # Rails framework code, used to essentially:
       # - handle configuration entries which are specific to Datadog tracing
       # - instrument parts of the framework when needed
+      #
+      # rubocop:disable Metrics/ModuleLength
       module Framework
         # configure Datadog settings
         def self.setup
           rails_config = pre_initialize_config_with_defaults
 
-          # TODO we can't nest Datadog.configure
+          # TODO: we can't nest Datadog.configure
 
           # NOTE: #configure has the side effect of rebuilding trace components.
           #       During a typical Rails application lifecycle, we will see trace
@@ -33,20 +35,19 @@ module Datadog
           #       used to reconfigure tracer components with Rails-sourced defaults.
           #       This is a trade-off we take to get nice defaults.
 
-
           # Datadog.configure do |datadog_config|
           datadog_config = Datadog.configuration
-            # By default, default service would be guessed from the script
-            # being executed, but here we know better, get it from Rails config.
-            # Don't set this if service has been explicitly provided by the user.
-            datadog_config.service ||= rails_config[:service_name]
+          # By default, default service would be guessed from the script
+          # being executed, but here we know better, get it from Rails config.
+          # Don't set this if service has been explicitly provided by the user.
+          datadog_config.service ||= rails_config[:service_name]
 
-            activate_rack!(datadog_config, rails_config)
-            activate_action_cable!(datadog_config, rails_config)
-            activate_active_support!(datadog_config, rails_config)
-            activate_action_pack!(datadog_config, rails_config)
-            activate_action_view!(datadog_config, rails_config)
-            activate_active_record!(datadog_config, rails_config)
+          activate_rack!(datadog_config, rails_config)
+          activate_action_cable!(datadog_config, rails_config)
+          activate_active_support!(datadog_config, rails_config)
+          activate_action_pack!(datadog_config, rails_config)
+          activate_action_view!(datadog_config, rails_config)
+          activate_active_record!(datadog_config, rails_config)
           # end
         end
 
@@ -115,7 +116,7 @@ module Datadog
           datadog_config.use(
             :active_support,
             cache_service: rails_config[:cache_service],
-          # tracer: rails_config[:tracer]
+            # tracer: rails_config[:tracer]
           )
         end
 
@@ -129,7 +130,7 @@ module Datadog
           datadog_config.use(
             :action_cable,
             service_name: "#{rails_config[:service_name]}-#{Contrib::ActionCable::Ext::SERVICE_NAME}",
-          # tracer: rails_config[:tracer]
+            # tracer: rails_config[:tracer]
           )
         end
 
@@ -147,7 +148,7 @@ module Datadog
           datadog_config.use(
             :action_pack,
             service_name: rails_config[:service_name],
-          # tracer: rails_config[:tracer]
+            # tracer: rails_config[:tracer]
           )
         end
 
@@ -161,7 +162,7 @@ module Datadog
           datadog_config.use(
             :action_view,
             service_name: rails_config[:service_name],
-          # tracer: rails_config[:tracer]
+            # tracer: rails_config[:tracer]
           )
         end
 
@@ -175,7 +176,7 @@ module Datadog
           datadog_config.use(
             :active_record,
             service_name: rails_config[:database_service],
-          # tracer: rails_config[:tracer]
+            # tracer: rails_config[:tracer]
           )
         end
 

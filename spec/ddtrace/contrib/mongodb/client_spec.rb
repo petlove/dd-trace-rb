@@ -6,7 +6,7 @@ require 'mongo'
 
 RSpec.describe 'Mongo::Client instrumentation' do
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   let(:client) { Mongo::Client.new(["#{host}:#{port}"], client_options) }
   let(:client_options) { { database: database } }

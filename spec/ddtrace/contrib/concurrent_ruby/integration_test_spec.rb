@@ -13,7 +13,7 @@ RSpec.describe 'ConcurrentRuby integration tests' do
   end
 
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   subject(:deferred_execution) do
     outer_span = tracer.trace('outer_span')
@@ -36,7 +36,7 @@ RSpec.describe 'ConcurrentRuby integration tests' do
   shared_examples_for 'deferred execution' do
     before do
       Datadog.configure do |c|
-        c.use :concurrent_ruby#, tracer: tracer
+        c.use :concurrent_ruby # , tracer: tracer
       end
     end
 
@@ -60,7 +60,7 @@ RSpec.describe 'ConcurrentRuby integration tests' do
   describe 'patching' do
     subject(:patch) do
       Datadog.configure do |c|
-        c.use :concurrent_ruby#, tracer: tracer
+        c.use :concurrent_ruby # , tracer: tracer
       end
     end
 
@@ -88,7 +88,7 @@ RSpec.describe 'ConcurrentRuby integration tests' do
 
     before do
       Datadog.configure do |c|
-        c.use :concurrent_ruby#, tracer: tracer
+        c.use :concurrent_ruby # , tracer: tracer
       end
     end
 

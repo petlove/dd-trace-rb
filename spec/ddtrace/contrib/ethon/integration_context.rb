@@ -55,7 +55,7 @@ RSpec.shared_context 'integration context' do
   end
 
   # let(:tracer) { get_test_tracer }
-  let(:configuration_options) { { } }
+  let(:configuration_options) { {} }
 
   before do
     Datadog.configure do |c|
