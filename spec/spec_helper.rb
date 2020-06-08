@@ -118,6 +118,7 @@ RSpec.configure do |config|
   config.order = :random
 
   config.after(:each) do
+    Datadog.shutdown!
     Datadog.configuration.reset!
   end
 end
