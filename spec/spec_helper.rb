@@ -93,6 +93,11 @@ RSpec.configure do |config|
     end
   end
 
+  config.before(:each) do
+    Datadog.shutdown!
+    Datadog.configuration.reset!
+  end
+
   config.include ConfigurationHelpers
   config.include ContainerHelpers
   config.include HealthMetricHelpers
@@ -116,9 +121,4 @@ RSpec.configure do |config|
   config.disable_monkey_patching!
   config.warnings = true
   config.order = :random
-
-  config.after(:each) do
-    Datadog.shutdown!
-    Datadog.configuration.reset!
-  end
 end

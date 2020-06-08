@@ -128,7 +128,7 @@ RSpec.describe 'Resque instrumentation' do
         end
 
         # On completion of the fork, `Datadog.tracer.shutdown!` will be invoked.
-        expect(tracer.writer).to receive(:stop)
+        expect(tracer).to receive(:shutdown!)
 
         tracer.trace('main.process') do
           perform_job(job_class)
@@ -138,7 +138,7 @@ RSpec.describe 'Resque instrumentation' do
       let(:main_span) { spans.first }
       let(:job_span) { spans.last }
 
-      xit 'is clean' do # TODO investigate
+      it 'is clean' do
         expect(spans).to have(2).items
         expect(Resque::Failure.count).to be(0)
         expect(main_span.name).to eq('main.process')
