@@ -30,10 +30,10 @@ begin
   # Ignore interpreter warnings from external libraries
   require 'warning'
 
-  # Suppress gem warnings
+  # Suppress external gem warnings
   Warning.ignore([:method_redefined, :not_reached, :unused_var, :safe, :taint, :missing_ivar], %r{.*/gems/[^/]*/lib/})
 
-  # Suppress internal warnings
+  # Suppress ddtrace warnings
   Warning.ignore([:missing_ivar])
 rescue LoadError
   puts 'warning suppressing gem not available, external library warnings will be displayed'
