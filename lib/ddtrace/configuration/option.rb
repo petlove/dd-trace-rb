@@ -13,16 +13,6 @@ module Datadog
       end
 
       def set(value)
-        # TODO safeguard against :tracer=
-        require 'rspec/mocks/test_double'
-        if !(definition.class < RSpec::Mocks::TestDouble) && definition.name == :tracer && !(value.class < Datadog::Configuration::Base) && !value.instance_variable_get(:@dd_use_real_tracer)
-          if value.is_a?(Proc)
-            raise "setting tracer PROC! #{value}"
-          else
-            raise "setting tracer! #{value}"
-          end
-        end
-
         old_value = @value
         (@value = context_exec(value, old_value, &definition.setter)).tap do |v|
           @is_set = true
