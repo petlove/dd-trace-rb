@@ -21,6 +21,7 @@ module Datadog
       #
       module Framework
         # configure Datadog settings
+        # TODO rename to #configure, as it happens during Datadog.configure
         def self.setup
           datadog_config = Datadog.configuration
           rails_config = pre_initialize_config_with_defaults(datadog_config)
@@ -57,6 +58,7 @@ module Datadog
 
             rails_config = post_initialize_config_with_defaults(datadog_config)
 
+            # TODO: I think this is needed, just not tested
             # Update the global :service if not set
             # unless datadog_config.service
             #   rails_config[:tracer].default_service = rails_config[:service_name]
@@ -64,6 +66,7 @@ module Datadog
 
             datadog_config.service ||= rails_config[:service_name]
 
+            # TODO: I think one of these two coming blocks are needed, just not tested
             # reconfigure_rack!(datadog_config, rails_config)
             # reconfigure_action_cable!(datadog_config, rails_config)
             # reconfigure_active_support!(datadog_config, rails_config)
