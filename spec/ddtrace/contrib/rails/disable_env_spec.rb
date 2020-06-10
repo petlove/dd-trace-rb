@@ -36,7 +36,7 @@ MESSAGE
   end
 
   before do
-    Datadog.configure {}
+    Datadog.configure {} # TODO: remove me
   end
 
   it 'does not instrument' do

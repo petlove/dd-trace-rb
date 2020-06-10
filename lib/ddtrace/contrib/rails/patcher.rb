@@ -66,11 +66,7 @@ module Datadog
 
         # Configure Rails tracing with settings
         def setup_tracer
-          if patched?
-            Datadog::Contrib::Rails::Framework.reconfigure
-          else
-            Datadog::Contrib::Rails::Framework.setup
-          end
+          Datadog::Contrib::Rails::Framework.setup
         end
       end
     end

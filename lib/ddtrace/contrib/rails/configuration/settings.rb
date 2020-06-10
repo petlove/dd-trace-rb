@@ -89,11 +89,12 @@ module Datadog
           #   end
           # end
 
-          def configure(options = {})
-            super.tap do
-              Framework.setup if Integration.patchable?
-            end
-          end
+          # TODO: remove me
+          # def configure(options = {})
+          #   super.tap do
+          #     # Framework.setup if Integration.patchable?
+          #   end
+          # end
         end
       end
     end
