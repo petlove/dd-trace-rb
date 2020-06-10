@@ -19,11 +19,11 @@ module Datadog
       # - handle configuration entries which are specific to Datadog tracing
       # - instrument parts of the framework when needed
       #
-      # rubocop:disable Metrics/ModuleLength
       module Framework
         # configure Datadog settings
         def self.setup
-          rails_config = pre_initialize_config_with_defaults
+          datadog_config = Datadog.configuration
+          rails_config = pre_initialize_config_with_defaults(datadog_config)
 
           # TODO: we can't nest Datadog.configure
 
@@ -36,7 +36,7 @@ module Datadog
           #       This is a trade-off we take to get nice defaults.
 
           # Datadog.configure do |datadog_config|
-          datadog_config = Datadog.configuration
+
           # By default, default service would be guessed from the script
           # being executed, but here we know better, get it from Rails config.
           # Don't set this if service has been explicitly provided by the user.
@@ -52,41 +52,50 @@ module Datadog
         end
 
         def self.reconfigure
-          datadog_config = Datadog.configuration
+          Datadog.configure do |datadog_config|
+            # datadog_config = Datadog.configuration
 
-          rails_config = post_initialize_config_with_defaults
+            rails_config = post_initialize_config_with_defaults(datadog_config)
 
-          # Update the global :service if not set
-          unless datadog_config.service
-            rails_config[:tracer].default_service = rails_config[:service_name]
+            # Update the global :service if not set
+            # unless datadog_config.service
+            #   rails_config[:tracer].default_service = rails_config[:service_name]
+            # end
+
+            datadog_config.service ||= rails_config[:service_name]
+
+            # reconfigure_rack!(datadog_config, rails_config)
+            # reconfigure_action_cable!(datadog_config, rails_config)
+            # reconfigure_active_support!(datadog_config, rails_config)
+            # reconfigure_action_pack!(datadog_config, rails_config)
+            # reconfigure_action_view!(datadog_config, rails_config)
+            # reconfigure_active_record!(datadog_config, rails_config)
+
+            # activate_rack!(datadog_config, rails_config)
+            # activate_action_cable!(datadog_config, rails_config)
+            # activate_active_support!(datadog_config, rails_config)
+            # activate_action_pack!(datadog_config, rails_config)
+            # activate_action_view!(datadog_config, rails_config)
+            # activate_active_record!(datadog_config, rails_config)
           end
-
-          datadog_config.service ||= rails_config[:service_name]
-
-          reconfigure_rack!(datadog_config, rails_config)
-          reconfigure_action_cable!(datadog_config, rails_config)
-          reconfigure_active_support!(datadog_config, rails_config)
-          reconfigure_action_pack!(datadog_config, rails_config)
-          reconfigure_action_view!(datadog_config, rails_config)
-          reconfigure_active_record!(datadog_config, rails_config)
         end
 
-        def self.pre_initialize_config_with_defaults
+        def self.pre_initialize_config_with_defaults(datadog_config)
           # We set defaults here instead of in the patcher because we need to wait
           # for the Rails application to be fully initialized.
-          Datadog.configuration[:rails].tap do |config|
-            config[:service_name] ||= Datadog.configuration.service
+          datadog_config[:rails].tap do |config|
+            config[:service_name] ||= datadog_config.service
             # config[:database_service] ||= "#{config[:service_name]}-#{Contrib::ActiveRecord::Utils.adapter_name}"
             # config[:controller_service] ||= config[:service_name]
             # config[:cache_service] ||= "#{config[:service_name]}-cache"
           end
         end
 
-        def self.post_initialize_config_with_defaults
+        def self.post_initialize_config_with_defaults(datadog_config)
           # We set defaults here instead of in the patcher because we need to wait
           # for the Rails application to be fully initialized.
-          Datadog.configuration[:rails].tap do |config|
-            config[:service_name] ||= (Datadog.configuration.service || Utils.app_name || 'rails')
+          datadog_config[:rails].tap do |config|
+            config[:service_name] ||= (datadog_config.service || Utils.app_name || 'rails')
             config[:database_service] ||= "#{config[:service_name]}-#{Contrib::ActiveRecord::Utils.adapter_name}"
             config[:controller_service] ||= config[:service_name]
             config[:cache_service] ||= "#{config[:service_name]}-cache"
