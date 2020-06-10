@@ -38,10 +38,11 @@ module Datadog
 
           # Datadog.configure do |datadog_config|
 
+          # TODO: I think this is needed, just not tested
           # By default, default service would be guessed from the script
           # being executed, but here we know better, get it from Rails config.
           # Don't set this if service has been explicitly provided by the user.
-          datadog_config.service ||= rails_config[:service_name]
+          # datadog_config.service ||= rails_config[:service_name]
 
           activate_rack!(datadog_config, rails_config)
           activate_action_cable!(datadog_config, rails_config)
@@ -87,7 +88,9 @@ module Datadog
           # We set defaults here instead of in the patcher because we need to wait
           # for the Rails application to be fully initialized.
           datadog_config[:rails].tap do |config|
-            config[:service_name] ||= datadog_config.service
+            # TODO: I think this single one is needed, just not tested
+            # config[:service_name] ||= datadog_config.service
+
             # config[:database_service] ||= "#{config[:service_name]}-#{Contrib::ActiveRecord::Utils.adapter_name}"
             # config[:controller_service] ||= config[:service_name]
             # config[:cache_service] ||= "#{config[:service_name]}-cache"
@@ -98,7 +101,7 @@ module Datadog
           # We set defaults here instead of in the patcher because we need to wait
           # for the Rails application to be fully initialized.
           datadog_config[:rails].tap do |config|
-            config[:service_name] ||= (datadog_config.service || Utils.app_name || 'rails')
+            config[:service_name] ||= (datadog_config.service || Utils.app_name) # || 'rails') # Can prob remove this
             config[:database_service] ||= "#{config[:service_name]}-#{Contrib::ActiveRecord::Utils.adapter_name}"
             config[:controller_service] ||= config[:service_name]
             config[:cache_service] ||= "#{config[:service_name]}-cache"
