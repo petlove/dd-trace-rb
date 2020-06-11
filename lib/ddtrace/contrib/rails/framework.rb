@@ -23,8 +23,8 @@ module Datadog
         # After the Rails application finishes initializing, we configure the Rails
         # integration and all its sub-components with the application information
         # available.
-        # We do this after the initialization because not all values are available
-        # before then.
+        # We do this after the initialization because not all the information we
+        # require is available before then.
         def self.setup
           # NOTE: #configure has the side effect of rebuilding trace components.
           #       During a typical Rails application lifecycle, we will see trace
@@ -50,9 +50,9 @@ module Datadog
           end
         end
 
-        # Rails.application is now fully initialized.
-        # We reconfigure with new values made available.
         def self.config_with_defaults(datadog_config)
+          # We set defaults here instead of in the patcher because we need to wait
+          # for the Rails application to be fully initialized.
           datadog_config[:rails].tap do |config|
             config[:service_name] ||= (Datadog.configuration.service || Utils.app_name)
             config[:database_service] ||= "#{config[:service_name]}-#{Contrib::ActiveRecord::Utils.adapter_name}"
