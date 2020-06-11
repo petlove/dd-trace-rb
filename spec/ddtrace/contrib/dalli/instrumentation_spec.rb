@@ -10,7 +10,6 @@ RSpec.describe 'Dalli instrumentation' do
   let(:test_port) { ENV.fetch('TEST_MEMCACHED_PORT', '11211') }
 
   let(:client) { ::Dalli::Client.new("#{test_host}:#{test_port}") }
-  # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
   # Enable the test tracer

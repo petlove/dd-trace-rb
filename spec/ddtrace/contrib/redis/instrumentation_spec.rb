@@ -9,7 +9,6 @@ RSpec.describe 'Redis instrumentation test' do
   let(:test_port) { ENV.fetch('TEST_REDIS_PORT', 6379).to_i }
 
   let(:client) { Redis.new(host: test_host, port: test_port) }
-  # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
   around do |example|

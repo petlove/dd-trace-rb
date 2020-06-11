@@ -18,7 +18,6 @@ RSpec.describe 'net/http requests' do
   let(:uri) { "http://#{host}:#{port}" }
 
   let(:client) { Net::HTTP.new(host, port) }
-  # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
   before do

@@ -9,7 +9,6 @@ RSpec.describe Datadog::Contrib::ActiveSupport::Notifications::Subscription do
 
   describe 'instance' do
     subject(:subscription) { described_class.new(tracer, span_name, options, &block) }
-    # let(:tracer) { get_test_tracer }
     let(:span_name) { double('span_name') }
     let(:options) { {} }
     let(:payload) { {} }

@@ -27,31 +27,6 @@ RSpec.configure do |config|
         @spans << trace
       end
     end
-
-    # allow(Datadog::Configuration::Components).to receive(:build_tracer).and_wrap_original do |original_method, settings|
-    #   if @tracer
-    #     # We monitor and raise errors on all methods calls to stale tracer instances.
-    #     # We allow #shutdown! to be called though, as finalizing a stale instance is allowed.
-    #     methods = (Datadog::Tracer.instance_methods - Object.instance_methods) - [:shutdown!]
-    #     methods.each do |method|
-    #       allow(@tracer).to receive(method).and_raise(
-    #         "Stale tracer instance: superseded during reconfiguration at #{caller.drop(2).join("\n")}"
-    #       )
-    #     end
-    #   end
-    #
-    #   @tracer = if defined?(@use_real_tracer) && @use_real_tracer
-    #               original_method.call(settings)
-    #             else
-    #               get_test_tracer(default_service: settings.service,
-    #                               enabled: settings.tracer.enabled,
-    #                               partial_flush: settings.tracer.partial_flush.enabled,
-    #                               tags: settings.tags.dup.tap do |tags|
-    #                                 tags['env'] = settings.env unless settings.env.nil?
-    #                                 tags['version'] = settings.version unless settings.version.nil?
-    #                               end)
-    #             end
-    # end
   end
 
   def use_real_tracer!

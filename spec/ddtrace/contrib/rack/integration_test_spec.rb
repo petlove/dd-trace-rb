@@ -9,7 +9,6 @@ require 'ddtrace/contrib/rack/middlewares'
 RSpec.describe 'Rack integration tests' do
   include Rack::Test::Methods
 
-  # let(:tracer) { get_test_tracer }
   let(:rack_options) { {} }
 
   before(:each) do

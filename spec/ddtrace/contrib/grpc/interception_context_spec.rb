@@ -6,7 +6,6 @@ require 'ddtrace'
 
 RSpec.describe GRPC::InterceptionContext do
   subject(:interception_context) { described_class.new }
-  # let(:tracer) { get_test_tracer }
   let(:configuration_options) { { service_name: 'rspec' } }
 
   describe '#intercept!' do
