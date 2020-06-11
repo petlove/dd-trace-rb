@@ -10,6 +10,8 @@ RSpec.describe 'Sequel configuration' do
     skip unless Datadog::Contrib::Sequel::Integration.compatible?
   end
 
+  let(:span) { spans.first }
+
   describe 'for a SQLite database' do
     let(:sequel) do
       Sequel.sqlite(':memory:').tap do |db|
@@ -63,9 +65,8 @@ RSpec.describe 'Sequel configuration' do
         it do
           sequel
           Datadog.configure { |c| c.use :sequel }
-
           perform_query!
-          expect(spans.first.service).to eq('sqlite')
+          expect(span.service).to eq('sqlite')
         end
       end
     end
