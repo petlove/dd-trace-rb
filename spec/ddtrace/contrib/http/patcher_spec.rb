@@ -19,7 +19,7 @@ RSpec.describe 'net/http patcher' do
   end
 
   let(:request_span) do
-    tracer.writer.spans(:keep).find { |span| span.name == Datadog::Contrib::HTTP::Ext::SPAN_REQUEST }
+    spans.find { |span| span.name == Datadog::Contrib::HTTP::Ext::SPAN_REQUEST }
   end
 
   describe 'with default configuration' do

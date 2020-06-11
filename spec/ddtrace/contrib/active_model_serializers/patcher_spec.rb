@@ -14,10 +14,6 @@ RSpec.describe 'ActiveModelSerializers patcher' do
   # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
-  def all_spans
-    tracer.writer.spans(:keep)
-  end
-
   before(:each) do
     # Supress active_model_serializers log output in the test run
     ActiveModelSerializersHelpers.disable_logging
@@ -56,7 +52,7 @@ RSpec.describe 'ActiveModelSerializers patcher' do
     end
 
     let(:active_model_serializers_span) do
-      all_spans.select { |s| s.name == name }.first
+      spans.select { |s| s.name == name }.first
     end
 
     if ActiveModelSerializersHelpers.ams_0_10_or_newer?

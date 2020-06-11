@@ -12,11 +12,6 @@ RSpec.describe 'Redis instrumentation test' do
   # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
-  def all_spans
-    tracer.writer.spans(:keep)
-  end
-  let(:span) { all_spans.first }
-
   around do |example|
     # Reset before and after each example; don't allow global state to linger.
     Datadog.registry[:redis].reset_configuration!
@@ -44,11 +39,11 @@ RSpec.describe 'Redis instrumentation test' do
     context 'and #set is called' do
       before do
         client.set('abc', 123)
-        try_wait_until { all_spans.any? }
+        try_wait_until { fetch_spans.any? }
       end
 
       it 'calls instrumentation' do
-        expect(all_spans.size).to eq(1)
+        expect(spans.size).to eq(1)
         expect(span.service).to eq(service_name)
         expect(span.name).to eq('redis.command')
         expect(span.span_type).to eq('redis')
@@ -75,11 +70,11 @@ RSpec.describe 'Redis instrumentation test' do
     context 'and #set is called' do
       before do
         client.set('abc', 123)
-        try_wait_until { all_spans.any? }
+        try_wait_until { fetch_spans.any? }
       end
 
       it 'calls instrumentation' do
-        expect(all_spans.size).to eq(1)
+        expect(spans.size).to eq(1)
         expect(span.service).to eq(service_name)
         expect(span.name).to eq('redis.command')
         expect(span.span_type).to eq('redis')

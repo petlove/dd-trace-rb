@@ -21,7 +21,7 @@ RSpec.describe 'net/http requests' do
   # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
-  let(:spans) { tracer.writer.spans }
+  # let(:spans) { tracer.writer.spans }
 
   before do
     Datadog.configure { |c| c.use :http, configuration_options }

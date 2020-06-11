@@ -71,10 +71,9 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
     end
   end
 
-  subject(:spans) do
+  subject(:count) do
     gadget_class.count
     widget_class.count
-    tracer.writer.spans
   end
 
   let(:gadget_span) { spans[0] }
@@ -145,6 +144,7 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
         end
 
         it do
+          subject
           # Gadget is configured to show up as its own database service
           expect(gadget_span.service).to eq(gadget_db_service_name)
           # Widget is configured to show up as its own database service
@@ -165,6 +165,7 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
         end
 
         it do
+          subject
           # Gadget is configured to show up as its own database service
           expect(gadget_span.service).to eq(gadget_db_service_name)
           # Widget isn't, ends up assigned to the default database service
@@ -183,6 +184,7 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
         end
 
         it do
+          subject
           # Gadget belongs to the default database
           expect(gadget_span.service).to eq(default_db_service_name)
           # Widget belongs to its own database
@@ -204,6 +206,7 @@ RSpec.describe 'ActiveRecord multi-database implementation' do
       end
 
       it do
+        subject
         # Gadget belongs to the default database
         expect(gadget_span.service).to eq(default_db_service_name)
         # Widget belongs to its own database

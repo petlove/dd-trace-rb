@@ -9,10 +9,6 @@ RSpec.describe 'Racecar patcher' do
   # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
-  def all_spans
-    tracer.writer.spans(:keep)
-  end
-
   before(:each) do
     Datadog.configure do |c|
       c.use :racecar, configuration_options
@@ -41,7 +37,7 @@ RSpec.describe 'Racecar patcher' do
     end
 
     let(:span) do
-      all_spans.select { |s| s.name == Datadog::Contrib::Racecar::Ext::SPAN_MESSAGE }.first
+      spans.select { |s| s.name == Datadog::Contrib::Racecar::Ext::SPAN_MESSAGE }.first
     end
 
     context 'that doesn\'t raise an error' do
@@ -119,7 +115,7 @@ RSpec.describe 'Racecar patcher' do
     end
 
     let(:span) do
-      all_spans.select { |s| s.name == Datadog::Contrib::Racecar::Ext::SPAN_BATCH }.first
+      spans.select { |s| s.name == Datadog::Contrib::Racecar::Ext::SPAN_BATCH }.first
     end
 
     context 'that doesn\'t raise an error' do

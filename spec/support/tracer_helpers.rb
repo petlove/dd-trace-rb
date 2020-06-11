@@ -6,7 +6,8 @@ require 'support/faux_writer'
 module TracerHelpers
   # Returns the current tracer instance
   def tracer
-    @tracer || instance_double(Datadog::Tracer, 'Bad tracer instance: created before Datadog.configure')
+    Datadog.tracer
+    # @tracer || instance_double(Datadog::Tracer, 'Bad tracer instance: created before Datadog.configure')
   end
 
   def new_tracer(options = {})
@@ -131,7 +132,26 @@ module TracerHelpers
   end
 
   def spans
-    @spans ||= writer.spans
+    @spans ||= fetch_spans
+  end
+
+  def fetch_spans
+    spans = tracer.instance_variable_get(:@spans) || []
+    spans.flatten.sort! do |a, b|
+      if a.name == b.name
+        if a.resource == b.resource
+          if a.start_time == b.start_time
+            a.end_time <=> b.end_time
+          else
+            a.start_time <=> b.start_time
+          end
+        else
+          a.resource <=> b.resource
+        end
+      else
+        a.name <=> b.name
+      end
+    end
   end
 
   # Returns the only span in the current tracer writer.
@@ -147,54 +167,9 @@ module TracerHelpers
   end
 
   def clear_spans
-    writer.spans(:clear)
+    tracer.instance_variable_set(:@spans, [])
 
     @spans = nil
     @span = nil
-  end
-
-  def self.included(config)
-    # Ensure tracer environment is clean before running test
-    #
-    # This is done :before and not :after because doing so after
-    # can create noise for test assertions. For example:
-    # +expect(Datadog).to receive(:shutdown!).once+
-    config.before(:each) do
-      Datadog.shutdown!
-      Datadog.configuration.reset!
-    end
-
-    # Ensure only the most recent tracer instance (found under +Datadog.tracer+) is actively used.
-    # Trying to perform operations on a stale tracer will raise errors during a test run.
-    config.before(:each) do
-      allow(Datadog::Configuration::Components).to receive(:build_tracer).and_wrap_original do |original_method, settings|
-        if @tracer
-          # We monitor and raise errors on all methods calls to stale tracer instances.
-          # We allow #shutdown! to be called though, as finalizing a stale instance is allowed.
-          methods = (Datadog::Tracer.instance_methods - Object.instance_methods) - [:shutdown!]
-          methods.each do |method|
-            allow(@tracer).to receive(method).and_raise(
-              "Stale tracer instance: superseded during reconfiguration at #{caller.drop(2).join("\n")}"
-            )
-          end
-        end
-
-        @tracer = if defined?(@use_real_tracer) && @use_real_tracer
-                    original_method.call(settings)
-                  else
-                    get_test_tracer(default_service: settings.service,
-                                    enabled: settings.tracer.enabled,
-                                    partial_flush: settings.tracer.partial_flush.enabled,
-                                    tags: settings.tags.dup.tap do |tags|
-                                      tags['env'] = settings.env unless settings.env.nil?
-                                      tags['version'] = settings.version unless settings.version.nil?
-                                    end)
-                  end
-      end
-    end
-  end
-
-  def use_real_tracer!
-    @use_real_tracer = true
   end
 end

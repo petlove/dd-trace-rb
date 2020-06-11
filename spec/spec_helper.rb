@@ -24,8 +24,6 @@ require 'support/spy_transport'
 require 'support/synchronization_helpers'
 require 'support/tracer_helpers'
 
-require 'ddtrace/contrib/support/contrib_helpers'
-
 begin
   # Ignore interpreter warnings from external libraries
   require 'warning'
@@ -53,13 +51,6 @@ RSpec.configure do |config|
   config.include SpanHelpers
   config.include SynchronizationHelpers
   config.include TracerHelpers
-
-  # Contrib specific helper code
-  # TODO: We don't need to load this for non-contrib tests.
-  # TODO: We should have all contrib tests require 'spec_contrib_helper',
-  # TODO: instead of 'spec_helper', but this requires touching all contrib
-  # TODO: test files.
-  config.include ContribHelpers
 
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
