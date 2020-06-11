@@ -10,8 +10,6 @@ RSpec.describe GRPC::InterceptionContext do
   let(:configuration_options) { { service_name: 'rspec' } }
 
   describe '#intercept!' do
-    let(:span) { tracer.writer.spans.first }
-
     before do
       Datadog.configure do |c|
         c.use :grpc, configuration_options

@@ -135,7 +135,7 @@ module TracerHelpers
     @spans ||= fetch_spans
   end
 
-  def fetch_spans
+  def fetch_spans(tracer = self.tracer)
     spans = tracer.instance_variable_get(:@spans) || []
     spans.flatten.sort! do |a, b|
       if a.name == b.name

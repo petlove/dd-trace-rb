@@ -22,8 +22,6 @@ RSpec.describe 'tracing on the server connection' do
     Datadog.registry[:grpc].reset_configuration!
   end
 
-  let(:span) { tracer.writer.spans.first }
-
   shared_examples 'span data contents' do
     specify { expect(span.name).to eq 'grpc.service' }
     specify { expect(span.span_type).to eq 'web' }

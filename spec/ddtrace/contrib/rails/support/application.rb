@@ -34,10 +34,7 @@ RSpec.shared_context 'Rails test application' do
     end
 
     # Clear out any spans generated during initialization
-    clear_spans! if defined?(tracer)
-    #   clear_spans!
-    #   # tracer.writer.spans if tracer.writer.class <= FauxWriter
-    # end
+    clear_spans!
   end
 
   if Rails.version < '4.0'

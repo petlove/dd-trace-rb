@@ -65,12 +65,11 @@ RSpec.describe Datadog::Contrib::DelayedJob::Plugin, :delayed_job_active_record 
     subject(:job_run) { Delayed::Job.enqueue(sample_job_object.new, job_params) }
 
     it 'creates a span' do
-      expect { job_run }.to change { tracer.writer.spans.first }.to be_instance_of(Datadog::Span)
+      expect { job_run }.to change { fetch_spans.first }.to be_instance_of(Datadog::Span)
     end
 
     context 'when the job looks like Active Job' do
       subject(:job_run) { Delayed::Job.enqueue(active_job_sample_job_object.new, job_params) }
-      subject(:span) { tracer.writer.spans.first }
 
       before { job_run }
 
@@ -80,8 +79,6 @@ RSpec.describe Datadog::Contrib::DelayedJob::Plugin, :delayed_job_active_record 
     end
 
     describe 'created span' do
-      subject(:span) { tracer.writer.spans.first }
-
       before { job_run }
 
       it 'has service name taken from configuration' do
