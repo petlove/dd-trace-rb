@@ -68,8 +68,8 @@ module ConfigurationHelpers
 
         option = original_method.receiver
 
-        if option.definition.class >= RSpec::Mocks::TestDouble && # This is not a real option, just a mock
-           option.definition.name == :tracer # We only care about +tracer=+
+        if option.definition.class >= RSpec::Mocks::TestDouble && # Not a real {Configuration::Option}, just a mock
+           option.definition.name == :tracer # We only care about +#tracer=+
 
           raise 'Eagerly setting tracer is not allowed'
         end

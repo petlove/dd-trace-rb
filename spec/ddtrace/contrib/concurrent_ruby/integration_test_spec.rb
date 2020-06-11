@@ -37,9 +37,7 @@ RSpec.describe 'ConcurrentRuby integration tests' do
       Datadog.configure do |c|
         c.use :concurrent_ruby
       end
-    end
 
-    before do
       deferred_execution
     end
 

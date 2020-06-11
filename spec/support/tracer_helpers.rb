@@ -4,10 +4,9 @@ require 'support/faux_writer'
 
 # rubocop:disable Metrics/ModuleLength
 module TracerHelpers
-  # Returns the current tracer instance
+  # Return a test tracer instance with a faux writer.
   def tracer
-    Datadog.tracer
-    # @tracer || instance_double(Datadog::Tracer, 'Bad tracer instance: created before Datadog.configure')
+    @tracer ||= new_tracer
   end
 
   def new_tracer(options = {})
@@ -132,26 +131,7 @@ module TracerHelpers
   end
 
   def spans
-    @spans ||= fetch_spans
-  end
-
-  def fetch_spans(tracer = self.tracer)
-    spans = tracer.instance_variable_get(:@spans) || []
-    spans.flatten.sort! do |a, b|
-      if a.name == b.name
-        if a.resource == b.resource
-          if a.start_time == b.start_time
-            a.end_time <=> b.end_time
-          else
-            a.start_time <=> b.start_time
-          end
-        else
-          a.resource <=> b.resource
-        end
-      else
-        a.name <=> b.name
-      end
-    end
+    @spans ||= writer.spans
   end
 
   # Returns the only span in the current tracer writer.
@@ -167,7 +147,7 @@ module TracerHelpers
   end
 
   def clear_spans!
-    tracer.instance_variable_set(:@spans, [])
+    writer.spans(:clear)
 
     @spans = nil
     @span = nil
