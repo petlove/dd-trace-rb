@@ -25,9 +25,6 @@ RSpec.describe 'Mysql2::Client patcher' do
   let(:username) { ENV.fetch('TEST_MYSQL_USER') { 'root' } }
   let(:password) { ENV.fetch('TEST_MYSQL_PASSWORD') { 'root' } }
 
-  let(:spans) { tracer.writer.spans(:keep) }
-  let(:span) { spans.first }
-
   before(:each) do
     Datadog.configure do |c|
       c.use :mysql2, configuration_options

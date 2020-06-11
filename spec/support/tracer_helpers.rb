@@ -166,7 +166,7 @@ module TracerHelpers
               end
   end
 
-  def clear_spans
+  def clear_spans!
     tracer.instance_variable_set(:@spans, [])
 
     @spans = nil

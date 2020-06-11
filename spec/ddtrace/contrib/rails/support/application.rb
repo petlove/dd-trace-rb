@@ -34,8 +34,8 @@ RSpec.shared_context 'Rails test application' do
     end
 
     # Clear out any spans generated during initialization
-    clear_spans if defined?(tracer)
-    #   clear_spans
+    clear_spans! if defined?(tracer)
+    #   clear_spans!
     #   # tracer.writer.spans if tracer.writer.class <= FauxWriter
     # end
   end

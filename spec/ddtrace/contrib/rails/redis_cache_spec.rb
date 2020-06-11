@@ -102,7 +102,7 @@ MESSAGE
 
         # check that the value is really updated, and persistent
         expect(cache.read(key)).to eq(51)
-        clear_spans
+        clear_spans!
 
         # if value exists, fetch returns it and does no update
         expect(cache.fetch(key) { 7 }).to eq(51)

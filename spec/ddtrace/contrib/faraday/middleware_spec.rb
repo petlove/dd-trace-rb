@@ -23,7 +23,7 @@ RSpec.describe 'Faraday middleware' do
   let(:configuration_options) { {} }
 
   let(:request_span) do
-    tracer.writer.spans(:keep).find { |span| span.name == Datadog::Contrib::Faraday::Ext::SPAN_REQUEST }
+    spans.find { |span| span.name == Datadog::Contrib::Faraday::Ext::SPAN_REQUEST }
   end
 
   before(:each) do

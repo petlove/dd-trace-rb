@@ -25,9 +25,6 @@ RSpec.describe 'Rails trace analytics' do
     Datadog.registry[:action_pack].reset_configuration!
   end
 
-  let(:span) { spans.first }
-  # let(:spans) { tracer.writer.spans(:keep) }
-
   describe 'for a controller action' do
     subject(:result) { action.call(env) }
     let(:controller) do

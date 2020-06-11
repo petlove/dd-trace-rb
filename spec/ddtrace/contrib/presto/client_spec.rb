@@ -6,7 +6,6 @@ require 'presto-client'
 require 'ddtrace/contrib/analytics_examples'
 
 RSpec.describe 'Presto::Client instrumentation' do
-  # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
   let(:client) do
@@ -32,14 +31,7 @@ RSpec.describe 'Presto::Client instrumentation' do
   let(:http_proxy) { 'proxy.example.com:8080' }
   let(:model_version) { '0.205' }
 
-  let(:spans) { tracer.writer.spans(:keep) }
-  let(:span) { spans.first }
-
   let(:presto_client_gem_version) { Gem.loaded_specs['presto-client'].version }
-
-  def discard_spans!
-    tracer.writer.spans
-  end
 
   before(:each) do
     Datadog.configure do |c|
@@ -228,7 +220,7 @@ RSpec.describe 'Presto::Client instrumentation' do
 
       context 'a failed query' do
         before(:each) do
-          discard_spans!
+          clear_spans!
           begin
             client.run('SELECT banana')
           # rubocop:disable Lint/HandleExceptions
