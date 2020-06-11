@@ -35,10 +35,6 @@ MESSAGE
     end)
   end
 
-  before do
-    Datadog.configure {} # TODO: remove me
-  end
-
   it 'does not instrument' do
     # make the request and assert the proper span
     get '/'

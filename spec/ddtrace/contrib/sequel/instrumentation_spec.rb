@@ -10,7 +10,7 @@ RSpec.describe 'Sequel instrumentation' do
   let(:configuration_options) { {} }
   let(:sequel) do
     Sequel.sqlite(':memory:').tap do |s|
-      Datadog.configure(s, tracer: tracer)
+      Datadog.configure(s)
     end
   end
 
