@@ -63,8 +63,9 @@ RSpec.describe 'Sequel configuration' do
         it do
           sequel
           Datadog.configure { |c| c.use :sequel }
+
           perform_query!
-          expect(span.service).to eq('sqlite')
+          expect(spans.first.service).to eq('sqlite')
         end
       end
     end
