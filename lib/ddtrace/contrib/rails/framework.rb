@@ -20,37 +20,11 @@ module Datadog
       # - instrument parts of the framework when needed
       #
       module Framework
-        # This methods run before Rails finished initializing, thus
-        # some options (e.g. :service_name) might not have their final value.
-        #
-        # Values used in this method are relevant only for the period between
-        # the execution of +Datadog.configure{}+ and the complete initialization
-        # of Rails. In other others, Rails instrumentation that happens during
-        # Rails startup.
-        #
-        # After Rails has finished initializing, and for the lifetime of the application
-        # thereafter, the values from +reconfigure+ are used instead.
-        #
-        # TODO rename to #configure, as it happens during Datadog.configure
-        # def self.setup
-        #   datadog_config = Datadog.configuration
-        #   rails_config = pre_initialize_config_with_defaults(datadog_config)
-        #
-        #   # By default, default service would be guessed from the script
-        #   # being executed, but here we know better, get it from Rails config.
-        #   # Don't set this if service has been explicitly provided by the user.
-        #   datadog_config.service ||= rails_config[:service_name]
-        #
-        #   activate_rack!(datadog_config, rails_config)
-        #   activate_action_cable!(datadog_config, rails_config)
-        #   activate_active_support!(datadog_config, rails_config)
-        #   activate_action_pack!(datadog_config, rails_config)
-        #   activate_action_view!(datadog_config, rails_config)
-        #   activate_active_record!(datadog_config, rails_config)
-        # end
-
-        # Reconfigure Rails and all its integrations with the values
-        # available after the application has finished initializing.
+        # After the Rails application finishes initializing, we configure the Rails
+        # integration and all its sub-components with the application information
+        # available.
+        # We do this after the initialization because not all values are available
+        # before then.
         def self.setup
           # NOTE: #configure has the side effect of rebuilding trace components.
           #       During a typical Rails application lifecycle, we will see trace
@@ -60,7 +34,7 @@ module Datadog
           #       used to reconfigure tracer components with Rails-sourced defaults.
           #       This is a trade-off we take to get nice defaults.
           Datadog.configure do |datadog_config|
-            rails_config = post_initialize_config_with_defaults(datadog_config)
+            rails_config = config_with_defaults(datadog_config)
 
             # By default, default service would be guessed from the script
             # being executed, but here we know better, get it from Rails config.
@@ -76,19 +50,11 @@ module Datadog
           end
         end
 
-        # Rails.application is not fully initialized yet.
-        # We configure values that we are sure of their value at this point.
-        # def self.pre_initialize_config_with_defaults(datadog_config)
-        #   datadog_config[:rails].tap do |config|
-        #     config[:service_name] ||= datadog_config.service
-        #   end
-        # end
-
         # Rails.application is now fully initialized.
         # We reconfigure with new values made available.
-        def self.post_initialize_config_with_defaults(datadog_config)
+        def self.config_with_defaults(datadog_config)
           datadog_config[:rails].tap do |config|
-            config[:service_name] ||= datadog_config.service || Utils.app_name
+            config[:service_name] ||= (Datadog.configuration.service || Utils.app_name)
             config[:database_service] ||= "#{config[:service_name]}-#{Contrib::ActiveRecord::Utils.adapter_name}"
             config[:controller_service] ||= config[:service_name]
             config[:cache_service] ||= "#{config[:service_name]}-cache"
@@ -98,7 +64,6 @@ module Datadog
         def self.activate_rack!(datadog_config, rails_config)
           datadog_config.use(
             :rack,
-            # tracer: rails_config[:tracer],
             application: ::Rails.application,
             service_name: rails_config[:service_name],
             middleware_names: rails_config[:middleware_names],
@@ -106,39 +71,23 @@ module Datadog
           )
         end
 
-        # def self.reconfigure_rack!(datadog_config, rails_config)
-        #   datadog_config[:rack][:service_name] = rails_config[:service_name]
-        #   datadog_config[:rack][:middleware_names] = rails_config[:middleware_names]
-        #   datadog_config[:rack][:distributed_tracing] = rails_config[:distributed_tracing]
-        # end
-
         def self.activate_active_support!(datadog_config, rails_config)
           return unless defined?(::ActiveSupport)
 
           datadog_config.use(
             :active_support,
-            cache_service: rails_config[:cache_service],
-            # tracer: rails_config[:tracer]
+            cache_service: rails_config[:cache_service]
           )
         end
-
-        # def self.reconfigure_active_support!(datadog_config, rails_config)
-        #   datadog_config[:active_support][:cache_service] = rails_config[:cache_service]
-        # end
 
         def self.activate_action_cable!(datadog_config, rails_config)
           return unless defined?(::ActionCable)
 
           datadog_config.use(
             :action_cable,
-            service_name: "#{rails_config[:service_name]}-#{Contrib::ActionCable::Ext::SERVICE_NAME}",
-            # tracer: rails_config[:tracer]
+            service_name: "#{rails_config[:service_name]}-#{Contrib::ActionCable::Ext::SERVICE_NAME}"
           )
         end
-
-        # def self.reconfigure_action_cable!(datadog_config, rails_config)
-        #   datadog_config[:action_cable][:service_name] = rails_config[:service_name]
-        # end
 
         def self.activate_action_pack!(datadog_config, rails_config)
           return unless defined?(::ActionPack)
@@ -149,42 +98,27 @@ module Datadog
 
           datadog_config.use(
             :action_pack,
-            service_name: rails_config[:service_name],
-            # tracer: rails_config[:tracer]
+            service_name: rails_config[:service_name]
           )
         end
-
-        # def self.reconfigure_action_pack!(datadog_config, rails_config)
-        #   datadog_config[:action_pack][:service_name] = rails_config[:service_name]
-        # end
 
         def self.activate_action_view!(datadog_config, rails_config)
           return unless defined?(::ActionView)
 
           datadog_config.use(
             :action_view,
-            service_name: rails_config[:service_name],
-            # tracer: rails_config[:tracer]
+            service_name: rails_config[:service_name]
           )
         end
-
-        # def self.reconfigure_action_view!(datadog_config, rails_config)
-        #   datadog_config[:action_view][:service_name] = rails_config[:service_name]
-        # end
 
         def self.activate_active_record!(datadog_config, rails_config)
           return unless defined?(::ActiveRecord)
 
           datadog_config.use(
             :active_record,
-            service_name: rails_config[:database_service],
-            # tracer: rails_config[:tracer]
+            service_name: rails_config[:database_service]
           )
         end
-
-        # def self.reconfigure_active_record!(datadog_config, rails_config)
-        #   datadog_config[:active_record][:service_name] = rails_config[:database_service]
-        # end
       end
     end
   end
