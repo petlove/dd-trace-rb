@@ -52,10 +52,6 @@ module Datadog
             Upgrade to the configuration API using the migration guide here:
             https://github.com/DataDog/dd-trace-rb/releases/tag/v0.11.0).freeze
 
-          # def tracer=(tracer)
-          #   Datadog.configuration[:grpc][:tracer] = tracer
-          # end
-
           def service_name=(service_name)
             Datadog.configuration[:grpc][:service_name] = service_name
           end

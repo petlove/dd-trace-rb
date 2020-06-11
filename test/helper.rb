@@ -282,12 +282,3 @@ module TestTracerHelper
 
   def configure; end
 end
-
-require 'ddtrace/contrib/patcher'
-
-Datadog::Contrib::Patcher::CommonMethods.send(:prepend, Module.new do
-  # Raise error during tests that fail to patch integration, instead of simply printing a warning message.
-  def on_patch_error(e)
-    raise e
-  end
-end)
