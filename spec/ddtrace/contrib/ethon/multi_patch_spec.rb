@@ -1,3 +1,5 @@
+require 'ddtrace/contrib/support/spec_helper'
+
 require 'ethon'
 require 'ddtrace/contrib/ethon/multi_patch'
 require 'ddtrace/contrib/ethon/shared_examples'

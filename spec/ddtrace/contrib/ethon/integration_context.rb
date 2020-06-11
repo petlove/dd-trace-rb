@@ -1,3 +1,5 @@
+require 'webrick'
+
 RSpec.shared_context 'integration context' do
   before(:all) do
     @log_buffer = StringIO.new # set to $stderr to debug
@@ -54,7 +56,6 @@ RSpec.shared_context 'integration context' do
     url
   end
 
-  # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
 
   before do

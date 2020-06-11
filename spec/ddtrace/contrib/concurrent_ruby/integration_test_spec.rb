@@ -49,11 +49,11 @@ RSpec.describe 'ConcurrentRuby integration tests' do
     end
 
     it 'writes inner span to tracer' do
-      expect(tracer.writer.spans).to include(inner_span)
+      expect(spans).to include(inner_span)
     end
 
     it 'writes outer span to tracer' do
-      expect(tracer.writer.spans).to include(outer_span)
+      expect(spans).to include(outer_span)
     end
   end
 
