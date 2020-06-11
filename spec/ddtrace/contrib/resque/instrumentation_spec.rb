@@ -7,10 +7,6 @@ require 'ddtrace'
 RSpec.describe 'Resque instrumentation' do
   include_context 'Resque job'
 
-  # let(:tracer) { get_test_tracer }
-  let(:spans) { tracer.writer.spans }
-  let(:span) { spans.first }
-
   let(:url) { "redis://#{host}:#{port}" }
   let(:host) { ENV.fetch('TEST_REDIS_HOST', '127.0.0.1') }
   let(:port) { ENV.fetch('TEST_REDIS_PORT', 6379) }

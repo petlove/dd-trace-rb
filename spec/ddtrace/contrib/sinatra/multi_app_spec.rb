@@ -9,11 +9,7 @@ require 'ddtrace/contrib/sinatra/tracer'
 RSpec.describe 'Sinatra instrumentation for multi-apps' do
   include Rack::Test::Methods
 
-  # let(:tracer) { get_test_tracer }
   let(:options) { {} }
-
-  let(:span) { spans.first }
-  let(:spans) { tracer.writer.spans }
 
   before do
     Datadog.configure do |c|

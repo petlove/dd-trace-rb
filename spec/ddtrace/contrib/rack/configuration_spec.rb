@@ -9,11 +9,7 @@ require 'ddtrace/contrib/rack/middlewares'
 RSpec.describe 'Rack integration configuration' do
   include Rack::Test::Methods
 
-  # let(:tracer) { get_test_tracer }
   let(:configuration_options) { {} }
-
-  let(:spans) { tracer.writer.spans }
-  let(:span) { spans.first }
 
   before(:each) do
     Datadog.configure do |c|

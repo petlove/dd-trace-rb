@@ -12,9 +12,6 @@ RSpec.describe 'Rack integration tests' do
   # let(:tracer) { get_test_tracer }
   let(:rack_options) { {} }
 
-  let(:spans) { tracer.writer.spans }
-  let(:span) { spans.first }
-
   before(:each) do
     Datadog.configure do |c|
       c.use :rack, rack_options

@@ -39,7 +39,6 @@ RSpec.describe 'net/http miniapp tests' do
       end
 
       let(:path) { '/my/path' }
-      # let(:spans) { tracer.writer.spans }
       let(:parent_span) { spans[2] }
       let(:http_spans) { spans[0..1] }
       let(:trace_id) { spans[2].trace_id }
