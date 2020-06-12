@@ -12,7 +12,7 @@ class DisabledTracerTest < TracerTestBase
     super
 
     Sidekiq::Testing.server_middleware do |chain|
-      @tracer.configure(enabled: false)
+      Datadog.tracer.configure(enabled: false)
       chain.add(Datadog::Contrib::Sidekiq::ServerTracer)
     end
   end
@@ -20,7 +20,6 @@ class DisabledTracerTest < TracerTestBase
   def test_empty
     EmptyWorker.perform_async()
 
-    spans = @writer.spans()
     assert_equal(0, spans.length)
   end
 end

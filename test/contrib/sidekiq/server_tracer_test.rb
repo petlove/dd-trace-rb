@@ -43,7 +43,6 @@ class ServerTracerTest < TracerTestBase
   def test_empty
     EmptyWorker.perform_async()
 
-    spans = @writer.spans()
     assert_equal(2, spans.length)
 
     span, _push = spans
@@ -64,7 +63,6 @@ class ServerTracerTest < TracerTestBase
     rescue TestError
     end
 
-    spans = @writer.spans()
     assert_equal(2, spans.length)
 
     span, _push = spans
@@ -84,7 +82,6 @@ class ServerTracerTest < TracerTestBase
     EmptyWorker.perform_async()
     CustomWorker.perform_async('random_id')
 
-    spans = @writer.spans()
     assert_equal(4, spans.length)
 
     custom, empty, _push, _push = spans
@@ -108,6 +105,6 @@ class ServerTracerTest < TracerTestBase
 
   def test_delayed_extensions
     DelayableClass.delay.do_work
-    assert_equal('ServerTracerTest::DelayableClass.do_work', @writer.spans.first.resource)
+    assert_equal('ServerTracerTest::DelayableClass.do_work', spans.first.resource)
   end
 end

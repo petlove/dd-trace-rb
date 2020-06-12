@@ -23,7 +23,6 @@ class TracedAPITest < BaseAPITest
     assert last_response.ok?
     assert_equal('OK', last_response.body)
 
-    spans = @tracer.writer.spans()
     assert_equal(spans.length, 2)
     render = spans[0]
     run = spans[1]
@@ -51,7 +50,6 @@ class TracedAPITest < BaseAPITest
       get '/base/hard_failure'
     end
 
-    spans = @tracer.writer.spans()
     assert_equal(spans.length, 2)
     render = spans[0]
     run = spans[1]
@@ -85,7 +83,6 @@ class TracedAPITest < BaseAPITest
     assert last_response.ok?
     assert_equal('OK', last_response.body)
 
-    spans = @tracer.writer.spans()
     assert_equal(spans.length, 4)
 
     render, run, before, after = spans
@@ -129,7 +126,6 @@ class TracedAPITest < BaseAPITest
       get '/filtered_exception/before'
     end
 
-    spans = @tracer.writer.spans()
     assert_equal(spans.length, 2)
 
     run, before = spans

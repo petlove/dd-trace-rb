@@ -97,7 +97,7 @@ class TracingControllerTest < ActionController::TestCase
     assert_response :success
 
     # Verify all spans have closed
-    assert_equal(true, @tracer.call_context.trace.all?(&:finished?))
+    assert_equal(true, tracer.call_context.trace.all?(&:finished?))
 
     # Verify correct number of spans
     assert_equal(spans.length, 4)
@@ -254,10 +254,10 @@ class TracingControllerTest < ActionController::TestCase
   end
 
   test 'combining rails and custom tracing is supported' do
-    @tracer.trace('a-parent') do
+    tracer.trace('a-parent') do
       get :index
       assert_response :success
-      @tracer.trace('a-brother') do
+      tracer.trace('a-brother') do
       end
     end
 

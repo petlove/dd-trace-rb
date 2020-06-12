@@ -17,7 +17,7 @@ class TracerTest < TracerTestBase
 
   def test_configuration_custom
     # it should configure the tracer with users' settings
-    @tracer.configure(enabled: false)
+    Datadog.tracer.configure(enabled: false)
     Sidekiq::Testing.server_middleware do |chain|
       chain.add(
         Datadog::Contrib::Sidekiq::ServerTracer,

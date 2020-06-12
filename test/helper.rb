@@ -28,19 +28,23 @@ module Datadog
   class Writer
     attr_accessor :trace_handler, :service_handler, :worker
   end
+
   class Tracer
     remove_method :writer
     attr_accessor :writer
   end
+
   module Workers
     class AsyncTransport
       attr_accessor :transport
     end
   end
+
   class Context
     remove_method :current_span
     attr_accessor :trace, :sampled, :finished_spans, :current_span
   end
+
   class Span
     attr_accessor :meta, :metrics
   end
@@ -243,42 +247,77 @@ def remove_patch!(integration)
 end
 
 require 'minitest/around/unit'
+require 'minitest/stub_any_instance'
 
 module TestTracerHelper
+  # Integration name for settings cleanup
+  def integration_name; end
+
   def around(&block)
-    mock = lambda { |*_|
-      raise 'wrong tracer' if @tracer && @initialized
-      @tracer = get_test_tracer
+    if integration_name
+      Datadog.registry[integration_name].reset_configuration!
+      Datadog.configuration[integration_name].reset_options!
+    end
+
+    with_stubbed_tracer(&block)
+
+    if integration_name
+      Datadog.registry[integration_name].reset_configuration!
+      Datadog.configuration[integration_name].reset_options!
+    end
+  end
+
+  def with_stubbed_tracer
+    # The mutex must be eagerly initialized to prevent race conditions on lazy initialization
+    write_lock = Mutex.new
+    mock = lambda { |trace|
+      write_lock.synchronize do
+        @spans ||= []
+        @spans << trace
+      end
     }
 
-    if integration_name
-      Datadog.registry[integration_name].reset_configuration!
-      Datadog.configuration[integration_name].reset_options!
-    end
-
-    Datadog::Configuration::Components.stub(:build_tracer, mock) do
-      configure
-
-      @initialized = true
-      @tracer = Datadog.tracer
-      @writer = @tracer.writer
-
-      @writer.spans(:clear)
+    Datadog::Tracer.stub_any_instance(:write, mock) do
+      configure if defined?(configure)
 
       yield
-    end
-
-    if integration_name
-      Datadog.registry[integration_name].reset_configuration!
-      Datadog.configuration[integration_name].reset_options!
     end
   end
 
   def spans
-    @spans ||= @tracer.writer.spans(:keep)
+    @spans ||= fetch_spans
   end
 
-  def integration_name; end
+  def tracer
+    Datadog.tracer
+  end
 
-  def configure; end
+  # Retrieves and sorts all spans in the current tracer instance.
+  # This method does not cache its results.
+  def fetch_spans(tracer = self.tracer)
+    spans = tracer.instance_variable_get(:@spans) || []
+    spans.flatten.sort! do |a, b|
+      if a.name == b.name
+        if a.resource == b.resource
+          if a.start_time == b.start_time
+            a.end_time <=> b.end_time
+          else
+            a.start_time <=> b.start_time
+          end
+        else
+          a.resource <=> b.resource
+        end
+      else
+        a.name <=> b.name
+      end
+    end
+  end
+
+  # Remove all traces from the current tracer instance and
+  # busts cache of +#spans+.
+  def clear_spans!
+    tracer.instance_variable_set(:@spans, [])
+
+    @spans = nil
+  end
 end
