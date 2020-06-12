@@ -50,10 +50,15 @@ module Contrib
     RSpec.configure do |config|
       # Capture spans from the global tracer
       config.before(:each) do
+        # The mutex must be eagerly initialized to prevent race conditions on lazy initialization
+        write_lock = Mutex.new
+
         allow_any_instance_of(Datadog::Tracer).to receive(:write) do |tracer, trace|
           tracer.instance_exec do
-            @spans ||= []
-            @spans << trace
+            write_lock.synchronize do
+              @spans ||= []
+              @spans << trace
+            end
           end
         end
       end
