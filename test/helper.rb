@@ -10,12 +10,7 @@ require 'ddtrace/span'
 begin
   # Ignore interpreter warnings from external libraries
   require 'warning'
-
-  # Suppress external gem warnings
-  Warning.ignore([:method_redefined, :not_reached, :unused_var, :safe, :taint, :missing_ivar], %r{.*/gems/[^/]*/lib/})
-
-  # Suppress ddtrace warnings
-  Warning.ignore([:missing_ivar])
+  Warning.ignore([:method_redefined, :not_reached, :unused_var, :safe, :taint], %r{.*/gems/[^/]*/lib/})
 rescue LoadError
   puts 'warning suppressing gem not available, external library warnings will be displayed'
 end
@@ -28,23 +23,19 @@ module Datadog
   class Writer
     attr_accessor :trace_handler, :service_handler, :worker
   end
-
   class Tracer
     remove_method :writer
     attr_accessor :writer
   end
-
   module Workers
     class AsyncTransport
       attr_accessor :transport
     end
   end
-
   class Context
     remove_method :current_span
     attr_accessor :trace, :sampled, :finished_spans, :current_span
   end
-
   class Span
     attr_accessor :meta, :metrics
   end

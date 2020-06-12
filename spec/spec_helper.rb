@@ -27,12 +27,7 @@ require 'support/tracer_helpers'
 begin
   # Ignore interpreter warnings from external libraries
   require 'warning'
-
-  # Suppress external gem warnings
-  Warning.ignore([:method_redefined, :not_reached, :unused_var, :safe, :taint, :missing_ivar], %r{.*/gems/[^/]*/lib/})
-
-  # Suppress ddtrace warnings
-  Warning.ignore([:missing_ivar])
+  Warning.ignore([:method_redefined, :not_reached, :unused_var], %r{.*/gems/[^/]*/lib/})
 rescue LoadError
   puts 'warning suppressing gem not available, external library warnings will be displayed'
 end
