@@ -53,6 +53,8 @@ module Contrib
         # The mutex must be eagerly initialized to prevent race conditions on lazy initialization
         write_lock = Mutex.new
 
+        clear_spans!
+
         allow_any_instance_of(Datadog::Tracer).to receive(:write) do |tracer, trace|
           tracer.instance_exec do
             write_lock.synchronize do
