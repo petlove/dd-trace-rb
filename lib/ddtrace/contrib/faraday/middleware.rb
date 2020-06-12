@@ -5,6 +5,7 @@ require 'ddtrace/propagation/http_propagator'
 require 'ddtrace/contrib/analytics'
 require 'ddtrace/contrib/faraday/ext'
 require 'ddtrace/contrib/http_annotation_helper'
+require 'cgi'
 
 module Datadog
   module Contrib
@@ -65,7 +66,7 @@ module Datadog
         end
 
         def resource_name(env)
-          env[:method].to_s.upcase
+          eezee_request_resource_name(env) || resouce_name_method(env)
         end
 
         def build_request_options!(env)
@@ -74,6 +75,23 @@ module Datadog
 
         def datadog_configuration(host = :default)
           Datadog.configuration[:faraday, host]
+        end
+
+        def eezee_request_resource_name(env)
+          eezee_request = find_eezee_request(env[:url].to_s)
+          return unless eezee_request
+
+          "#{resouce_name_method(env)} #{eezee_request.path}"
+        end
+
+        def find_eezee_request(url)
+          ObjectSpace
+            .each_object(Eezee::Request)
+            .find { |instance| instance.uri == CGI.unescape(url) }
+        end
+
+        def resouce_name_method(env)
+          env[:method].to_s.upcase
         end
       end
     end
