@@ -4,9 +4,11 @@ require 'ddtrace/contrib/support/spec_helper'
 require 'ddtrace'
 
 RSpec.describe 'ConcurrentRuby integration tests' do
-  around do |example|
-    unmodified_future = ::Concurrent::Future.dup
-    example.run
+  # DEV We save an unmodified copy of Concurrent::Future.
+  let!(:unmodified_future) { ::Concurrent::Future.dup }
+
+  # DEV We then restore Concurrent::Future, a dangerous game.
+  after do
     ::Concurrent.send(:remove_const, :Future)
     ::Concurrent.const_set('Future', unmodified_future)
     remove_patch!(:concurrent_ruby)
@@ -14,32 +16,22 @@ RSpec.describe 'ConcurrentRuby integration tests' do
 
   let(:configuration_options) { {} }
 
-  subject(:deferred_execution) do
+  subject do
     outer_span = tracer.trace('outer_span')
-    inner_span = nil
     future = Concurrent::Future.new do
-      inner_span = tracer.trace('inner_span')
-      inner_span.finish
+      tracer.trace('inner_span') {}
     end
     future.execute
 
     future.wait
     outer_span.finish
-
-    { outer_span: outer_span, inner_span: inner_span }
   end
 
-  let(:outer_span) { deferred_execution[:outer_span] }
-  let(:inner_span) { deferred_execution[:inner_span] }
+  let(:outer_span) { spans.find { |s| s.name == 'outer_span' } }
+  let(:inner_span) { spans.find { |s| s.name == 'inner_span' } }
 
   shared_examples_for 'deferred execution' do
-    before do
-      Datadog.configure do |c|
-        c.use :concurrent_ruby
-      end
-
-      deferred_execution
-    end
+    before { subject }
 
     it 'creates outer span with nil parent' do
       expect(outer_span.parent).to be_nil
@@ -71,20 +63,22 @@ RSpec.describe 'ConcurrentRuby integration tests' do
     it_should_behave_like 'deferred execution'
 
     it 'inner span should not have parent' do
+      subject
       expect(inner_span.parent).to be_nil
     end
   end
 
   context 'when context propagation is enabled' do
-    it_should_behave_like 'deferred execution'
-
     before do
       Datadog.configure do |c|
         c.use :concurrent_ruby
       end
     end
 
+    it_should_behave_like 'deferred execution'
+
     it 'inner span parent should be included in outer span' do
+      subject
       expect(inner_span.parent).to eq(outer_span)
     end
   end
