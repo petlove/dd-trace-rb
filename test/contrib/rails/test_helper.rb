@@ -143,4 +143,9 @@ module RailsTest
     before_each
     super
   end
+
+  # For Rails < 4
+  def run(*_)
+    with_stubbed_tracer { super }
+  end
 end
