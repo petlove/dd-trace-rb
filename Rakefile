@@ -185,36 +185,6 @@ end
 
 desc 'CI task; it runs all tests for current version of Ruby'
 task :ci do
-  if ENV.key?('CIRCLE_NODE_TOTAL') && ENV.key?('CIRCLE_NODE_INDEX')
-    puts 'Running in parallel mode. Each node will run a subset of the test suite.'
-
-    total_nodes = ENV['CIRCLE_NODE_TOTAL'].to_i
-    current_node = ENV['CIRCLE_NODE_INDEX'].to_i
-
-    original_sh = method(:sh)
-    define_singleton_method(:sh) do |*cmd, &block|
-      command = cmd[0]
-
-      if total_nodes <= 2
-        if total_nodes == 2
-          puts 'Not enough nodes to parallelize database tests'
-          puts 'Running all test serially'
-        end
-
-        original_sh.call(*cmd, &block)
-      end
-
-      # Keep Rails tests serial, as they compete for database resources
-      if command.include?('mysql')
-        original_sh.call(*cmd, &block) if current_node == (total_nodes - 1)
-      elsif command.include?('postgres')
-        original_sh.call(*cmd, &block) if current_node == (total_nodes - 2)
-      elsif command.hash % (total_nodes - 2) == current_node
-        original_sh.call(*cmd, &block)
-      end
-    end
-  end
-
   if Gem::Version.new(RUBY_VERSION) < Gem::Version.new(Datadog::VERSION::MINIMUM_RUBY_VERSION)
     raise NotImplementedError, "Ruby versions < #{Datadog::VERSION::MINIMUM_RUBY_VERSION} are not supported!"
   elsif Gem::Version.new('2.0.0') <= Gem::Version.new(RUBY_VERSION) \
@@ -224,7 +194,7 @@ task :ci do
     sh 'bundle exec rake spec:main'
     sh 'bundle exec rake spec:contrib'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Contrib minitests
@@ -281,7 +251,7 @@ task :ci do
     sh 'bundle exec rake spec:contrib'
     sh 'bundle exec rake spec:opentracer'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Contrib minitests
@@ -345,7 +315,7 @@ task :ci do
     sh 'bundle exec rake spec:contrib'
     sh 'bundle exec rake spec:opentracer'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Contrib minitests
@@ -420,7 +390,7 @@ task :ci do
     sh 'bundle exec rake spec:contrib'
     sh 'bundle exec rake spec:opentracer'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Contrib minitests
@@ -498,11 +468,11 @@ task :ci do
     sh 'bundle exec rake spec:opentracer'
     sh 'bundle exec rake spec:opentelemetry'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Benchmarks
-      ## sh 'bundle exec rake benchmark'
+      sh 'bundle exec rake benchmark'
       # Contrib minitests
       sh 'bundle exec appraisal contrib rake test:grape'
       sh 'bundle exec appraisal contrib rake test:sidekiq'
@@ -563,11 +533,11 @@ task :ci do
     sh 'bundle exec rake spec:opentracer'
     sh 'bundle exec rake spec:opentelemetry'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Benchmarks
-      ## sh 'bundle exec rake benchmark'
+      sh 'bundle exec rake benchmark'
       # Contrib minitests
       sh 'bundle exec appraisal contrib rake test:grape'
       sh 'bundle exec appraisal contrib rake test:sidekiq'
@@ -638,11 +608,11 @@ task :ci do
     sh 'bundle exec rake spec:opentracer'
     sh 'bundle exec rake spec:opentelemetry'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Benchmarks
-      ## sh 'bundle exec rake benchmark'
+      sh 'bundle exec rake benchmark'
       # Contrib minitests
       sh 'bundle exec appraisal contrib rake test:grape'
       sh 'bundle exec appraisal contrib rake test:sidekiq'
@@ -712,11 +682,11 @@ task :ci do
     sh 'bundle exec rake spec:opentracer'
     sh 'bundle exec rake spec:opentelemetry'
     # Benchmarks
-    ## sh 'bundle exec rake spec:benchmark'
+    sh 'bundle exec rake spec:benchmark'
 
     if RUBY_PLATFORM != 'java'
       # Benchmarks
-      ## sh 'bundle exec rake benchmark'
+      sh 'bundle exec rake benchmark'
       # Contrib minitests
       sh 'bundle exec appraisal contrib rake test:grape'
       sh 'bundle exec appraisal contrib rake test:sidekiq'
