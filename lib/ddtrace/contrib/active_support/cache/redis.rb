@@ -20,15 +20,6 @@ module Datadog
             # ActiveSupport includes a Redis cache store internally, and does not require these overrides.
             # https://github.com/rails/rails/blob/master/activesupport/lib/active_support/cache/redis_cache_store.rb
             def patch_redis?(meth)
-              # if defined?(::Rails.application.config.cache_store) &&
-              #    ::Rails.application.config.cache_store[0] == :redis_store
-              #   begin
-              #     require 'active_support/cache/redis_store'
-              #   rescue LoadError => _
-              #     return false
-              #   end
-              # end
-
               !Gem.loaded_specs['redis-activesupport'].nil? \
                 && defined?(::ActiveSupport::Cache::RedisStore) \
                 && ::ActiveSupport::Cache::RedisStore.instance_methods(false).include?(meth)

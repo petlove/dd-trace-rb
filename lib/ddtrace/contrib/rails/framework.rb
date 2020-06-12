@@ -18,7 +18,6 @@ module Datadog
       # Rails framework code, used to essentially:
       # - handle configuration entries which are specific to Datadog tracing
       # - instrument parts of the framework when needed
-      #
       module Framework
         # After the Rails application finishes initializing, we configure the Rails
         # integration and all its sub-components with the application information

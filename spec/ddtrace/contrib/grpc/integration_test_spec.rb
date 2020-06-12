@@ -55,9 +55,7 @@ RSpec.describe 'gRPC integration test' do
   end
 
   context 'client stream' do
-    before do
-      run_client_streamer
-    end
+    before { run_client_streamer }
     it_behaves_like 'associates child spans with the parent'
   end
 
