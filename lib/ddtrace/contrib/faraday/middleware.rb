@@ -78,7 +78,9 @@ module Datadog
         end
 
         def eezee_request_resource_name(env)
-          eezee_request = find_eezee_request(env[:url].to_s)
+          return unless defined?(Eezee)
+
+          eezee_request = find_eezee_request(env[:url])
           return unless eezee_request
 
           "#{resouce_name_method(env)} #{eezee_request.path}"
@@ -87,7 +89,7 @@ module Datadog
         def find_eezee_request(url)
           ObjectSpace
             .each_object(Eezee::Request)
-            .find { |instance| instance.uri == CGI.unescape(url) }
+            .find { |req| req.uri&.include?("#{url.scheme}://#{url.host}#{url.path}") }
         end
 
         def resouce_name_method(env)
