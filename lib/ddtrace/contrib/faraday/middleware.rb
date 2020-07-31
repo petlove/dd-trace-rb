@@ -39,7 +39,7 @@ module Datadog
         def annotate!(span, env, options)
           span.resource = resource_name(env)
           service_name(env[:url].host, options)
-          span.service = options[:split_by_domain] ? env[:url].host : options[:service_name]
+          span.service = "faraday-#{env[:url].host}"
           span.span_type = Datadog::Ext::HTTP::TYPE_OUTBOUND
 
           # Set analytics sample rate
